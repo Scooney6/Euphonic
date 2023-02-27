@@ -1,7 +1,7 @@
 # Team1
 Web application to compare music tastes!
 
-#Instructions to Run
+# Instructions to Run
 1. Install required packages:
 pip install requirements.txt
 
