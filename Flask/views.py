@@ -7,11 +7,11 @@ from Flask import app
 def index():
     return render_template("index.html")
 
-
-# Registration Page
-@app.route("/register", methods=["POST", "GET"])
-def register():
-    return render_template("register.html")
+# May not be needed
+# # Registration Page
+# @app.route("/register", methods=["POST", "GET"])
+# def register():
+#     return render_template("register.html")
 
 
 # Home Page
