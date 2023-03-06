@@ -17,9 +17,9 @@
     <!-- Top menu -->
     <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
         <div class="container">
-            <div class="navbar-text mr-auto">
-                <span>Hello {{ username }}!</span>
-            </div>
+            <a href="home" style="text-decoration:none;">
+                <button class="btn btn-secondary navbar-btn">Dashboard</button>
+            </a> 
             <a class="navbar-brand" href="home">Euphonic</a>
             <a href="/" style="text-decoration:none;"> <!-- Remove line when Logout is setup -->
                 <button class="btn btn-secondary navbar-btn">Logout</button>
@@ -27,6 +27,7 @@
         </div>
     </nav>
 
+    <!-- Body -->
     <div class="user-container">
         <div class="user">
             <h3>{{ username }}</h3>
