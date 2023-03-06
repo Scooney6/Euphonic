@@ -21,7 +21,7 @@
                 <span>Hello {{ username }}!</span>
             </div>
             <a class="navbar-brand" href="home">Euphonic</a>
-            <a href="/"> <!-- Remove line when Logout is setup -->
+            <a href="/" style="text-decoration:none;"> <!-- Remove line when Logout is setup -->
                 <button class="btn btn-secondary navbar-btn">Logout</button>
             </a> <!-- Remove line when Logout is setup -->
         </div>
@@ -33,9 +33,93 @@
         </div>
         <div class="comparison-score">
             <h3>{{ comparison_score }}%</h3>
+            <h6>Score</h6>
         </div>
         <div class="user">
             <h3>{{ friendsUsername }}</h3>
+        </div>
+    </div>
+
+    <div class="user-container">
+        <div class="user">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Top 5 Artists in Common</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Artist</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>{{ artist_1 }}</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>{{ artist_2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>{{ artist_3 }}</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>{{ artist_4 }}</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>{{ artist_5 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="user">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Top 5 Tracks in Common</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Track</th>
+                                <th scope="col">Artist</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>{{ track_1 }}</td>
+                                <td>{{ trackArtist_1 }}</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>{{ track_2 }}</td>
+                                <td>{{ trackArtist_2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>{{ track_3 }}</td>
+                                <td>{{ trackArtist_3 }}</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>{{ track_4 }}</td>
+                                <td>{{ trackArtist_4 }}</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>{{ track_5 }}</td>
+                                <td>{{ trackArtist_5 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
