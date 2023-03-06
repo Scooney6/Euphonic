@@ -1,10 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Compare | Euphonic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+        integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
+
 <body>
-This will be the comparison page
+    <!-- Top menu -->
+    <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
+        <div class="container">
+            <div class="navbar-text mr-auto">
+                <span>Hello {{ username }}!</span>
+            </div>
+            <a class="navbar-brand" href="home">Euphonic</a>
+            <a href="/"> <!-- Remove line when Logout is setup -->
+                <button class="btn btn-secondary navbar-btn">Logout</button>
+            </a> <!-- Remove line when Logout is setup -->
+        </div>
+    </nav>
+
+    <div class="user-container">
+        <div class="user">
+            <h3>{{ username }}</h3>
+        </div>
+        <div class="comparison-score">
+            <h3>{{ comparison_score }}%</h3>
+        </div>
+        <div class="user">
+            <h3>{{ friendsUsername }}</h3>
+        </div>
+    </div>
+
 </body>
+
 </html>
