@@ -1,10 +1,12 @@
 from flask import render_template
 from Flask import app
+from Database.db import *
 
 
 # Landing Page
 @app.route("/", methods=["POST", "GET"])
 def index():
+    print(getUsers())
     return render_template("index.html")
 
 
