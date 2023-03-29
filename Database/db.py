@@ -14,5 +14,5 @@ def connect():
 def getUsers():
     with connect() as con:
         cur = con.cursor()
-        cur.execute("SELECT Username FROM Users")
+        cur.execute("SELECT Username FROM User")
         return cur.fetchall()

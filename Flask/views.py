@@ -26,3 +26,9 @@ def home():
 @app.route("/compare", methods=["POST", "GET"])
 def compare():
     return render_template("compare.html")
+
+
+# Callback route
+@app.route("/callback", methods=["POST", "GET"])
+def callback():
+    pass
