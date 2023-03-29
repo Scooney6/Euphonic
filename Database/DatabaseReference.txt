@@ -1,0 +1,16 @@
+Our database system is MySQL. MySQL server, client, and python connector (a module of MySQL itself) is installed and
+runs locally. Our project uses python to interface with MySQL alongside the python package: mysql-connector-python which is an
+official python package from MySQL. We then have a python function that opens a database connection, and functions in
+that file that call the connection function and query the database. These functions can be called from anywhere in the 
+program to get or update data from the database.
+
+The following functions will need to be implemented:
+getScore - takes username, returns score
+updateScore - takes 2 usernames and score
+getUserCred - takes username, returns password and spotifyAPI token
+adduser - takes username, password, spotifyAPI token
+getFriends - takes username, returns all list of friends
+addFriend - takes username of user and username of friend
+
+The design presented in previous diagrams has not changed since the announcement of plan B.
+

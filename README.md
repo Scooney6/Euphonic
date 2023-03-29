@@ -20,9 +20,19 @@ Web application to compare music tastes!
 
 		[flask]  
 		secret_key=YOUR_SECRET_KEY
+		
+6. Create file called sql.ini in the Config folder.
 
-6. Start the app with run.py
+7. Add the following to the sql.ini file (change the placeholders to your database connection):
+
+		[sql]
+		user=USERNAME
+		password=PASSWORD
+		host=ADDRESS
+		database=DBNAME
+
+8. Start the app with run.py
 
 		python3 run.py
 
-7. If everything is done correctly the console will give you the localhost address. Clicking that address takes you to the website.
+9. If everything is done correctly the console will give you the localhost address. Clicking that address takes you to the website.

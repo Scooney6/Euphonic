@@ -3,5 +3,4 @@ venv/
 __pycache__
 .vscode/
 .DS_Store
-flask.ini
-db.ini
+*.ini
