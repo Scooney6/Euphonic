@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Dashboard | Euphonic</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA==" crossorigin="anonymous" referrerpolicy="no-referrer"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+        integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
@@ -18,13 +19,16 @@
     <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
         <div class="container">
             <div class="navbar-text mr-auto">
-                <span>Hello {{ username }}!</span>
+                <span>Hello {{ username }}!
+                    {% if current_user.is_authenticated %}
+                    Hi {{ current_user.name }}!
+                    {% endif %}
+                </span>
             </div>
-            <a class="navbar-brand" href="home">Euphonic</a>
-            <a href="/" style="text-decoration:none;">
-                <!-- Remove line when Logout is setup -->
-                <button class="btn btn-secondary navbar-btn">Logout</button>
-            </a>
+            <a class="navbar-brand" href="{{ url_for('home') }}">Euphonic</a>
+            <form action="{{ url_for('logout') }}" method="POST">
+                <button type="submit" class="btn btn-secondary navbar-btn">Logout</button>
+            </form>
         </div>
     </nav>
 
@@ -35,11 +39,11 @@
             <h3>Find your Friends!</h3>
             <div class="row">
                 <div class="small-12 columns">
-                    <input type="text" placeholder="Type in friends username">
+                    <form action="{{ url_for('compare') }}" method="GET">
+                        <input type="text" name="friend_username" placeholder="Type in friends username"><br>
+                        <button type="submit" class="btn mt-4" style="text-decoration: none;">Send Request</button>
+                    </form>
                 </div>
-                <a href="compare" style="text-decoration: none;">
-                    <button class="btn mt-4">Send Request</button>
-                </a>
             </div>
         </div>
         <div class="comparison-score"></div>
@@ -59,31 +63,13 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for friend in friends %}
                             <tr>
-                                <td>1</td>
-                                <td>{{ friendFirst_1 }} {{ friendLast_1 }}</td>
-                                <td>{{ friendScore_1 }}</td>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ friend['first_name'] }}</td>
+                                <td>{{ friend['score'] }}</td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>{{ friendFirst_2 }} {{ friendLast_2 }}</td>
-                                <td>{{ friendScore_2 }}</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>{{ friendFirst_3 }} {{ friendLast_3 }}</td>
-                                <td>{{ friendScore_3 }}</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>{{ friendFirst_4 }} {{ friendLast_4 }}</td>
-                                <td>{{ friendScore_4 }}</td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>{{ friendFirst_5 }} {{ friendLast_5 }}</td>
-                                <td>{{ friendScore_5 }}</td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -103,51 +89,17 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for friend in friends %}
                             <tr>
-                                <td>1</td>
-                                <td>{{ friendFirst_1 }} {{ friendLast_1 }}</td>
-                                <td>{{ friendTrack_1 }}</td>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ friend['first_name'] }}</td>
+                                <td>{{ friend['track'] }}</td>
                                 <td>
-                                    <a href="compare">Compare</a>
+                                    <a href="{{ url_for('compare', friend_username=friend['username']) }}">Compare</a>
                                     <a href="#">Delete</a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>{{ friendFirst_2 }} {{ friendLast_2 }}</td>
-                                <td>{{ friendTrack_2 }}</td>
-                                <td>
-                                    <a href="compare">Compare</a>
-                                    <a href="#">Delete</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>{{ friendFirst_3 }} {{ friendLast_3 }}</td>
-                                <td>{{ friendTrack_3 }}</td>
-                                <td>
-                                    <a href="compare">Compare</a>
-                                    <a href="#">Delete</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>{{ friendFirst_4 }} {{ friendLast_4 }}</td>
-                                <td>{{ friendTrack_4 }}</td>
-                                <td>
-                                    <a href="compare">Compare</a>
-                                    <a href="#">Delete</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>{{ friendFirst_5 }} {{ friendLast_5 }}</td>
-                                <td>{{ friendTrack_5 }}</td>
-                                <td>
-                                    <a href="compare">Compare</a>
-                                    <a href="#">Delete</a>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

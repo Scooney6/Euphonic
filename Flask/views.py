@@ -1,75 +1,144 @@
-from flask import render_template
-# from flask_login import logout_user
+from datetime import datetime, timedelta
+from flask import render_template, redirect, url_for, request, g
+from flask_login import logout_user, login_required, current_user
 from Flask import app
 from Database.db import *
 
 
-# Landing Page
+# Login Page
 @app.route("/", methods=["POST", "GET"])
-def index():
-    print(getUsers())
-    return render_template("index.html")
+def login():
+    services = ['Spotify', 'Apple Music', 'Tidal', 'Google Play Music', 'Amazon Music', 'More to come!']
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.get_user(username)
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid username or password')
+    return render_template('index.html', services = services)
 
-# # Logout
-# @app.route('/logout', methods=['POST'])
-# def logout():
-#     logout_user()
-#     return redirect(url_for('index'))
+
+# Logout
+@app.route('/logout', methods=['POST'])
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 # Home Page
 @app.route("/home", methods=["POST", "GET"])
+@login_required
 def home():
     # Testcase
-    username = "John"
-    friendFirst_1 = "Sophia"
-    friendLast_1 = "Robertson"
-    friendScore_1 = 98
-    friendTrack_1 = "Flowers"
-    friendFirst_2 = "Lucas"
-    friendLast_2 = "Johnson"
-    friendScore_2 = 85
-    friendTrack_2 = "Kill Bill"
-    friendFirst_3 = "Aria"
-    friendLast_3 = "Patel"
-    friendScore_3 = 80
-    friendTrack_3 = "Boy's A Liar, Pt. 2"
-    friendFirst_4 = "Ethan"
-    friendLast_4 = "Baker"
-    friendScore_4 = 70
-    friendTrack_4 = "Creepin'"
-    friendFirst_5 = "Ava"
-    friendLast_5 = "Kim"
-    friendScore_5 = 10
-    friendTrack_5 = "Morgan Wallen"
+    username = current_user.username
+    friends = [
+        {
+            "first_name": "Sophia",
+            "last_name": "Robertson",
+            "score": 98,
+            "track": "Flowers"
+        },
+        {
+            "first_name": "Lucas",
+            "last_name": "Johnson",
+            "score": 85,
+            "track": "Kill Bill"
+        },
+        {
+            "first_name": "Aria",
+            "last_name": "Patel",
+            "score": 80,
+            "track": "Boy's A Liar, Pt. 2"
+        },
+        {
+            "first_name": "Ethan",
+            "last_name": "Baker",
+            "score": 70,
+            "track": "Creepin'"
+        },
+        {
+            "first_name": "Ava",
+            "last_name": "Kim",
+            "score": 10,
+            "track": "Last Night"
+        }
+    ]
+    # Sort friends list by descending score
+    friends.sort(key=lambda x: x['score'], reverse=True)
     # Code
-    return render_template(
-        "home.html",
-        username = username,
-        friendFirst_1 = friendFirst_1,
-        friendLast_1 = friendLast_1,
-        friendScore_1 = friendScore_1,
-        friendTrack_1 = friendTrack_1,
-        friendFirst_2 = friendFirst_2,
-        friendLast_2 = friendLast_2,
-        friendScore_2 = friendScore_2,
-        friendTrack_2 = friendTrack_2,
-        friendFirst_3 = friendFirst_3,
-        friendLast_3 = friendLast_3,
-        friendScore_3 = friendScore_3,
-        friendTrack_3 = friendTrack_3,
-        friendFirst_4 = friendFirst_4,
-        friendLast_4 = friendLast_4,
-        friendScore_4 = friendScore_4,
-        friendTrack_4 = friendTrack_4,
-        friendFirst_5 = friendFirst_5,
-        friendLast_5 = friendLast_5,
-        friendScore_5 = friendScore_5,
-        friendTrack_5 = friendTrack_5,
-        )
+    return render_template("home.html", username=username, friends=friends)
 
 
 # Comparison Page
 @app.route("/compare", methods=["POST", "GET"])
+@login_required
 def compare():
-    return render_template("compare.html")
+    # Testcase
+    username = current_user.username
+    friend_username = "Chris"
+    comparison_score = 80
+    artists = [
+        {
+            "name": "Drake",
+            "genre": "Hip-Hop/Rap"
+        },
+        {
+            "name": "Olivia Rodrigo",
+            "genre": "Pop"
+        },
+        {
+            "name": "The Weeknd",
+            "genre": "Dance/Electronic"
+        },
+        {
+            "name": "Taylor Swift",
+            "genre": "Pop"
+        },
+        {
+            "name": "Morgan Wallen",
+            "genre": "Country"
+        }
+    ]
+    tracks = [
+        {
+            "name": "Flowers",
+            "artist": "Miley Cyrus"
+        },
+        {
+            "name": "Kill Bill",
+            "artist": "SZA"
+        },
+        {
+            "name": "Boy's A Liar, Pt. 2",
+            "artist": "PinkPantheress & Ice Spice"
+        },
+        {
+            "name": "Creepin'",
+            "artist": "Metro Boomin, The Weeknd & 21 Savage"
+        },
+        {
+            "name": "Last Night",
+            "artist": "Morgan Wallen"
+        }
+    ]
+    # Code
+    return render_template(
+        "compare.html",
+        username=username,
+        friend_username=friend_username,
+        comparison_score=comparison_score,
+        artists=artists,
+        tracks=tracks
+    )
+
+
+# Callback route
+@app.route("/callback", methods=["POST", "GET"])
+@login_required
+def callback():
+    pass
