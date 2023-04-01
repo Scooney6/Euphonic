@@ -1,41 +1,79 @@
-from datetime import datetime, timedelta
-from flask import render_template, redirect, url_for, request, g
-from flask_login import logout_user, login_required, current_user
-from Flask import app
+import requests
+import secrets
+import string
+from urllib.parse import urlencode
+
+from flask import render_template, redirect, url_for, request, session
+from requests.auth import HTTPBasicAuth
+
+from Config.config import spotifyAuthParams
 from Database.db import *
+from Flask import app
 
 
 # Login Page
 @app.route("/", methods=["POST", "GET"])
-def login():
+def index():
     services = ['Spotify', 'Apple Music', 'Tidal', 'Google Play Music', 'Amazon Music', 'More to come!']
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        user = User.get_user(username)
-        if user and user.check_password(password):
-            login_user(user)
-            return redirect(url_for('home'))
+    return render_template('index.html', services=services)
+
+
+# Handle for login form submission
+@app.route('/login', methods=["POST"])
+def login():
+    if 'Username' in request.form and 'Password' in request.form:
+        username = request.form['Username']
+        password = request.form['Password']
+        if authenticate(username, password):
+            return redirect("home")
+    else:
+        return render_template("index.html", msg='Username and Password Required')
+
+
+# Handle for register form submission
+@app.route('/register', methods=["POST"])
+def register():
+    if 'username' in request.form and 'password' in request.form:
+        username = request.form['username']
+        password = request.form['password']
+        if getUser(username):
+            msg = 'Username taken'
+            return render_template("index.html", msg=msg)
         else:
-            flash('Invalid username or password')
-    return render_template('index.html', services = services)
+            # TODO implement addUser() in db.py
+            # addUser(username, password)
+
+            # Create Session variable for this user so we know they are logged in
+            session['loggedin'] = True
+            session['id'] = getUID(username)
+            session['username'] = username
+
+            # Build spotify authorization redirect url
+            params = spotifyAuthParams()
+            state_key = ''.join(
+                secrets.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(16))
+            query_params = {'client_id': params['client_id'],
+                            'response_type': 'code',
+                            'redirect_uri': params['redirect_uri'],
+                            'state': state_key,
+                            'scope': params['scope']}
+            query_string = urlencode(query_params)
+            return redirect('https://accounts.spotify.com/authorize?' + query_string)
+    else:
+        msg = 'Username and Password Required'
+        return render_template("index.html", msg=msg)
 
 
 # Logout
 @app.route('/logout', methods=['POST'])
 def logout():
-    logout_user()
     return redirect(url_for('login'))
 
 
 # Home Page
 @app.route("/home", methods=["POST", "GET"])
-@login_required
 def home():
     # Testcase
-    username = current_user.username
     friends = [
         {
             "first_name": "Sophia",
@@ -76,10 +114,8 @@ def home():
 
 # Comparison Page
 @app.route("/compare", methods=["POST", "GET"])
-@login_required
 def compare():
     # Testcase
-    username = current_user.username
     friend_username = "Chris"
     comparison_score = 80
     artists = [
@@ -137,8 +173,23 @@ def compare():
     )
 
 
-# Callback route
+# Callback route for spotify authorization
 @app.route("/callback", methods=["POST", "GET"])
-@login_required
 def callback():
-    pass
+    # get the code and state spotify gave us
+    code = request.args.get('code')
+    state = request.args.get('state')
+    if not state:
+        return render_template("index.html", msg="Error with Spotify Authentication.")
+    else:
+        # build request for user token
+        params = spotifyAuthParams()
+        url = 'https://accounts.spotify.com/api/token'
+        data = {'grant_type': 'authorization_code',
+                'code': code,
+                'redirect_uri': params['redirect_uri']}
+        r = requests.post(url, auth=HTTPBasicAuth(params['client_id'], params['client_secret']), data=data)
+        print(r)
+        print(r.json())
+        # TODO Store token, handle request errors, send user to home
+    print("redirect recieved")

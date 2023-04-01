@@ -47,7 +47,7 @@
                             id="logpass" autocomplete="off">
                           <i class="input-icon uil uil-lock-alt"></i>
                         </div>
-                        <input type="submit" value="Submit" class="btn mt-4"></a>
+                        <input type="submit" value="Submit" class="btn mt-4">
                         <!-- <p class="mb-0 mt-4 text-center"><a href="#0" class="link">Forgot your
                                                     password?</a></p> -->
                       </form>
@@ -58,39 +58,41 @@
                   <div class="center-wrap">
                     <div class="section text-center">
                       <h4 class="mb-4 pb-3">Register</h4>
-                      <div class="form-group">
-                        <input type="text" name="logfirstname" class="form-style" placeholder="First Name"
-                          id="logfirstname" autocomplete="off">
-                        <i class="input-icon uil uil-user"></i>
-                      </div>
-                      <div class="form-group mt-2">
-                        <input type="text" name="loglastName" class="form-style" placeholder="Last Name"
-                          id="loglastName" autocomplete="off">
-                        <i class="input-icon uil uil-user"></i>
-                      </div>
-                      <div class="form-group mt-2">
-                        <input type="email" name="logusername" class="form-style" placeholder="Username"
-                          id="logusername" autocomplete="off">
-                        <i class="input-icon uil uil-at"></i>
-                      </div>
-                      <div class="form-group mt-2">
-                        <input type="password" name="logpass" class="form-style" placeholder="Your Password"
-                          id="logpass" autocomplete="off">
-                        <i class="input-icon uil uil-lock-alt"></i>
-                      </div>
-                      <div class="form-group mt-2">
-                        <i class="input-icon uil uil-arrow-down"></i>
-                        <select class="form-style" name="service">
-                          {% for service in services %}
-                          {% if service == 'Spotify' %}
-                          <option value="{{ service }}" selected>{{ service }}</option>
-                          {% else %}
-                          <option value="{{ service }}">{{ service }}</option>
-                          {% endif %}
-                          {% endfor %}
-                        </select>
-                      </div>
-                      <a href="../home" class="btn mt-4">submit</a>
+                      <form action="{{ url_for('register') }}" method="POST">
+                        <div class="form-group">
+                          <input type="text" name="firstname" class="form-style" placeholder="First Name"
+                            id="firstname" autocomplete="off">
+                          <i class="input-icon uil uil-user"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <input type="text" name="lastName" class="form-style" placeholder="Last Name"
+                            id="lastName" autocomplete="off">
+                          <i class="input-icon uil uil-user"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <input type="text" name="username" class="form-style" placeholder="Username"
+                            id="username" autocomplete="off">
+                          <i class="input-icon uil uil-at"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <input type="password" name="password" class="form-style" placeholder="Your Password"
+                            id="password" autocomplete="off">
+                          <i class="input-icon uil uil-lock-alt"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <i class="input-icon uil uil-arrow-down"></i>
+                          <select class="form-style" name="service">
+                            {% for service in services %}
+                            {% if service == 'Spotify' %}
+                            <option value="{{ service }}" selected>{{ service }}</option>
+                            {% else %}
+                            <option value="{{ service }}">{{ service }}</option>
+                            {% endif %}
+                            {% endfor %}
+                          </select>
+                        </div>
+                        <input type="submit" value="Submit" class="btn mt-4">
+                      </form>
                     </div>
                   </div>
                 </div>
