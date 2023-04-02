@@ -1,12 +1,6 @@
-import requests
-import secrets
-import string
-from urllib.parse import urlencode
+from flask import render_template, redirect, request, session
 
-from flask import render_template, redirect, url_for, request, session
-from requests.auth import HTTPBasicAuth
-
-from Config.config import spotifyAuthParams
+from API.spotify import *
 from Database.db import *
 from Flask import app
 
@@ -14,7 +8,7 @@ from Flask import app
 # Login Page
 @app.route("/", methods=["POST", "GET"])
 def index():
-    services = ['Spotify', 'Apple Music', 'Tidal', 'Google Play Music', 'Amazon Music', 'More to come!']
+    services = ['Spotify', 'More to come!']
     return render_template('index.html', services=services)
 
 
@@ -25,6 +19,9 @@ def login():
         username = request.form['Username']
         password = request.form['Password']
         if authenticate(username, password):
+            session['username'] = username
+            session['uid'] = getUID(username)
+            session['loggedin'] = True
             return redirect("home")
     else:
         return render_template("index.html", msg='Username and Password Required')
@@ -45,20 +42,10 @@ def register():
 
             # Create Session variable for this user so we know they are logged in
             session['loggedin'] = True
-            session['id'] = getUID(username)
+            session['uid'] = getUID(username)
             session['username'] = username
 
-            # Build spotify authorization redirect url
-            params = spotifyAuthParams()
-            state_key = ''.join(
-                secrets.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(16))
-            query_params = {'client_id': params['client_id'],
-                            'response_type': 'code',
-                            'redirect_uri': params['redirect_uri'],
-                            'state': state_key,
-                            'scope': params['scope']}
-            query_string = urlencode(query_params)
-            return redirect('https://accounts.spotify.com/authorize?' + query_string)
+            return redirect('https://accounts.spotify.com/authorize?' + getAuthRedirect())
     else:
         msg = 'Username and Password Required'
         return render_template("index.html", msg=msg)
@@ -67,49 +54,54 @@ def register():
 # Logout
 @app.route('/logout', methods=['POST'])
 def logout():
-    return redirect(url_for('login'))
+    session.clear()
+    return redirect('/')
 
 
 # Home Page
 @app.route("/home", methods=["POST", "GET"])
 def home():
-    # Testcase
-    friends = [
-        {
-            "first_name": "Sophia",
-            "last_name": "Robertson",
-            "score": 98,
-            "track": "Flowers"
-        },
-        {
-            "first_name": "Lucas",
-            "last_name": "Johnson",
-            "score": 85,
-            "track": "Kill Bill"
-        },
-        {
-            "first_name": "Aria",
-            "last_name": "Patel",
-            "score": 80,
-            "track": "Boy's A Liar, Pt. 2"
-        },
-        {
-            "first_name": "Ethan",
-            "last_name": "Baker",
-            "score": 70,
-            "track": "Creepin'"
-        },
-        {
-            "first_name": "Ava",
-            "last_name": "Kim",
-            "score": 10,
-            "track": "Last Night"
-        }
-    ]
-    # Sort friends list by descending score
-    friends.sort(key=lambda x: x['score'], reverse=True)
-    # Code
-    return render_template("home.html", username=username, friends=friends)
+    if 'loggedin' in session:
+        print(makeGetRequest(session, 'https://api.spotify.com/v1/me/top/tracks', {'limit': '5'}))
+        # Testcase
+        friends = [
+            {
+                "first_name": "Sophia",
+                "last_name": "Robertson",
+                "score": 98,
+                "track": "Flowers"
+            },
+            {
+                "first_name": "Lucas",
+                "last_name": "Johnson",
+                "score": 85,
+                "track": "Kill Bill"
+            },
+            {
+                "first_name": "Aria",
+                "last_name": "Patel",
+                "score": 80,
+                "track": "Boy's A Liar, Pt. 2"
+            },
+            {
+                "first_name": "Ethan",
+                "last_name": "Baker",
+                "score": 70,
+                "track": "Creepin'"
+            },
+            {
+                "first_name": "Ava",
+                "last_name": "Kim",
+                "score": 10,
+                "track": "Last Night"
+            }
+        ]
+        # Sort friends list by descending score
+        friends.sort(key=lambda x: x['score'], reverse=True)
+        # Code
+        return render_template("home.html", username=session['username'], friends=friends)
+    else:
+        return redirect("/")
 
 
 # Comparison Page
@@ -165,7 +157,7 @@ def compare():
     # Code
     return render_template(
         "compare.html",
-        username=username,
+        username=session['username'],
         friend_username=friend_username,
         comparison_score=comparison_score,
         artists=artists,
@@ -182,14 +174,7 @@ def callback():
     if not state:
         return render_template("index.html", msg="Error with Spotify Authentication.")
     else:
-        # build request for user token
-        params = spotifyAuthParams()
-        url = 'https://accounts.spotify.com/api/token'
-        data = {'grant_type': 'authorization_code',
-                'code': code,
-                'redirect_uri': params['redirect_uri']}
-        r = requests.post(url, auth=HTTPBasicAuth(params['client_id'], params['client_secret']), data=data)
-        print(r)
-        print(r.json())
-        # TODO Store token, handle request errors, send user to home
-    print("redirect recieved")
+        if getFirstToken(session, code):
+            return redirect("home")
+        else:
+            return render_template("index.html", msg="Error with spotify authorization")
