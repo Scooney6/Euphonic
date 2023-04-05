@@ -1,0 +1,17 @@
+QUERY: Please provide 5 functional and non-functional requirements for a web app created in flask that uses Spotify's API and MySQL to compare a Spotify user's music taste.
+
+RESPONSE: Sure! Here are 5 functional and non-functional requirements for the web app you described:
+
+Functional Requirements:
+    User Authentication: The web app must allow users to login with their Spotify account credentials. This authentication mechanism must be secure and reliable.
+    Data Retrieval: The web app must be able to fetch data from the Spotify API, including the user's playlists, saved tracks, and user information.
+    Data Processing: The web app must be able to process the data retrieved from the Spotify API and compare the user's music taste with other users of the app. This processing must be efficient and accurate.
+    Results Presentation: The web app must be able to present the comparison results to the user in an intuitive and user-friendly way. This can be in the form of a graph, chart, or other visual representation.
+    Database Management: The web app must be able to store and manage user data in a MySQL database. This includes user account information, user preferences, and comparison results.
+
+Non-Functional Requirements:
+    Security: The web app must be secure and protect user data from unauthorized access or theft. It should follow industry-standard security practices such as encryption, secure authentication, and access control.
+    Scalability: The web app must be able to handle a large number of users and data efficiently. It should be designed with scalability in mind to accommodate future growth and user demand.
+    Performance: The web app must be fast and responsive, with quick page load times and minimal latency. It should be optimized for performance to ensure a smooth user experience.
+    Reliability: The web app must be reliable and available to users at all times. It should be designed to handle errors gracefully and recover from failures quickly.
+    Usability: The web app must be easy to use and navigate, with an intuitive interface and clear instructions. It should be designed with the user in mind to ensure a positive user experience.
