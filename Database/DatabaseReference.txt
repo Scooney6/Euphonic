@@ -7,8 +7,11 @@ program to get or update data from the database.
 The following functions will need to be implemented:
 getScore - takes username, returns score
 updateScore - takes 2 usernames and score
-getUserCred - takes username, returns password and spotifyAPI token
-adduser - takes username, password, spotifyAPI token
+getUser - takes username, returns matching username if exists
+authorize - takes username and password, returns true if match false if not
+getToken - takes username, returns token of that username
+adduser - takes username, password
+updateToken - takes username, token
 getFriends - takes username, returns all list of friends
 addFriend - takes username of user and username of friend
 

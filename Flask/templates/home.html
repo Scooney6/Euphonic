@@ -1,10 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Dashboard | Euphonic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+        integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
+
 <body>
-This will be the home page
+
+    <!-- Top menu -->
+    <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
+        <div class="container">
+            <div class="navbar-text mr-auto">
+                <span>Hello {{ username }}!
+                </span>
+            </div>
+            <a class="navbar-brand" href="{{ url_for('home') }}">Euphonic</a>
+            <form action="{{ url_for('logout') }}" method="POST">
+                <button type="submit" class="btn btn-secondary navbar-btn">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Body -->
+    <div class="user-container">
+        <div class="comparison-score"></div>
+        <div class="user">
+            <h3>Find your Friends!</h3>
+            <div class="row">
+                <div class="small-12 columns">
+                    <form action="{{ url_for('compare') }}" method="GET">
+                        <input type="text" name="friend_username" placeholder="Type in friends username"><br>
+                        <button type="submit" class="btn mt-4" style="text-decoration: none;">Send Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="comparison-score"></div>
+    </div>
+
+    <div class="user-container mt-5">
+        <div class="user" style="margin-top: -50px;">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">LEADERBOARD</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Friend</th>
+                                <th scope="col">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for friend in friends %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ friend['first_name'] }}</td>
+                                <td>{{ friend['score'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="user" style="margin-top: -50px;">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Friends</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Friend</th>
+                                <th scope="col">#1 Song</th>
+                                <th scope="col">Compare/Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for friend in friends %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ friend['first_name'] }}</td>
+                                <td>{{ friend['track'] }}</td>
+                                <td>
+                                    <a href="{{ url_for('compare', friend_username=friend['username']) }}">Compare</a>
+                                    <a href="#">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>

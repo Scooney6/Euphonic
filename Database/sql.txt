@@ -1,0 +1,62 @@
+Use Euphonic;
+
+CREATE TABLE `Euphonic`.`User` (
+`idUser` INT NOT NULL AUTO_INCREMENT,
+`username` VARCHAR(200) NOT NULL,
+`password` VARCHAR(200) NOT NULL,
+PRIMARY KEY (`idUser`));
+
+CREATE TABLE `Euphonic`.`Token` (
+`idUser` INT NOT NULL,
+`token` VARCHAR(200) NOT NULL,
+`refresh_token` VARCHAR(200) NOT NULL,
+`expires_in` VARCHAR(200) NOT NULL,
+PRIMARY KEY (`idUser`),
+FOREIGN KEY (`idUser`) REFERENCES `Euphonic`.`User` (`idUser`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION);
+
+CREATE TABLE `Euphonic`.`Friend` (
+`frienduser_id` INT NOT NULL,
+`username` VARCHAR(200) NULL,
+PRIMARY KEY (`frienduser_id`),
+INDEX `frienduser_id_idx` (`frienduser_id` ASC) VISIBLE,
+CONSTRAINT `frienduser_id`
+FOREIGN KEY (`frienduser_id`)
+REFERENCES `Euphonic`.`User` (`idUser`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION);
+
+CREATE TABLE `Euphonic`.`Comparison` (
+`userid1` INT NOT NULL,
+`userid2` INT NOT NULL,
+`Score` INT NULL,
+PRIMARY KEY (`userid1`, `userid2`),
+INDEX `userid2_idx` (`userid2` ASC) VISIBLE,
+CONSTRAINT `userid1`
+FOREIGN KEY (`userid1`)
+REFERENCES `Euphonic`.`User` (`idUser`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+CONSTRAINT `userid2`
+FOREIGN KEY (`userid2`)
+REFERENCES `Euphonic`.`Friend` (`frienduser_id`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION);
+
+CREATE TABLE `Euphonic`.`Adds` (
+`user` INT NOT NULL,
+`friend` INT NOT NULL,
+PRIMARY KEY (`user`, `friend`),
+INDEX `friend_idx` (`friend` ASC) VISIBLE,
+CONSTRAINT `user`
+FOREIGN KEY (`user`)
+REFERENCES `Euphonic`.`User` (`idUser`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+CONSTRAINT `friend`
+FOREIGN KEY (`friend`)
+REFERENCES `Euphonic`.`Friend` (`frienduser_id`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION);
+

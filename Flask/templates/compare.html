@@ -1,10 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Compare | Euphonic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+        integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
+
 <body>
-This will be the comparison page
+    <!-- Top menu -->
+    <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
+        <div class="container">
+            <a href="home" style="text-decoration:none;">
+                <button class="btn btn-secondary navbar-btn">Dashboard</button>
+            </a> 
+            <a class="navbar-brand" href="home">Euphonic</a>
+            <a href="/" style="text-decoration:none;"> <!-- Remove line when Logout is setup -->
+                <button class="btn btn-secondary navbar-btn">Logout</button>
+            </a> <!-- Remove line when Logout is setup -->
+        </div>
+    </nav>
+
+    <!-- Body -->
+    <div class="user-container">
+        <div class="user">
+            <h3>{{ username }}</h3>
+        </div>
+        <div class="comparison-score">
+            <h3>{{ comparison_score }}%</h3>
+            <h6>Score</h6>
+        </div>
+        <div class="user">
+            <h3>{{ friendsUsername }}</h3>
+        </div>
+    </div>
+
+    <div class="user-container">
+        <div class="user">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Top 5 Artists in Common</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Artist</th>
+                                <th scope="col">Genre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>{{ artist_1 }}</td>
+                                <td>{{ artistGenre_1 }}</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>{{ artist_2 }}</td>
+                                <td>{{ artistGenre_2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>{{ artist_3 }}</td>
+                                <td>{{ artistGenre_3 }}</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>{{ artist_4 }}</td>
+                                <td>{{ artistGenre_4 }}</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>{{ artist_5 }}</td>
+                                <td>{{ artistGenre_5 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="user">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="text-center mb-4">Top 5 Tracks in Common</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Track</th>
+                                <th scope="col">Artist</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>{{ track_1 }}</td>
+                                <td>{{ trackArtist_1 }}</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>{{ track_2 }}</td>
+                                <td>{{ trackArtist_2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>{{ track_3 }}</td>
+                                <td>{{ trackArtist_3 }}</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>{{ track_4 }}</td>
+                                <td>{{ trackArtist_4 }}</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>{{ track_5 }}</td>
+                                <td>{{ trackArtist_5 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
+
 </html>

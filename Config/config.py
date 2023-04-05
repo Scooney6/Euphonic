@@ -21,3 +21,7 @@ def configflask(filename='Config/flask.ini', section='flask'):
 
 def configsql(filename='Config/sql.ini', section='sql'):
     return configure(filename, section)
+
+
+def spotifyAuthParams(filename='Config/spotify.ini', section='spotify'):
+    return configure(filename, section)
