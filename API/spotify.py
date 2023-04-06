@@ -1,6 +1,8 @@
 import secrets
 import string
 import time
+from functools import lru_cache
+
 import requests
 
 from urllib.parse import urlencode
@@ -62,7 +64,7 @@ def refreshToken(r_token):
 
 
 # Function to check the status of a token and refresh it if need be
-def checkTokenStatus(session):
+def checkUserTokenStatus(session):
     if time.time() > session['token_expiration']:
         payload = refreshToken(session['refresh_token'])
         if payload:
@@ -75,23 +77,47 @@ def checkTokenStatus(session):
     return "Success"
 
 
+def checkTokenStatus(uid):
+    token_info = getToken(uid)
+    if time.time() > token_info[2]:
+        payload = refreshToken(token_info[1])
+        if payload:
+            updateToken(payload['access_token'], payload['refresh_token'], time.time() + payload['expires_in'], uid)
+    else:
+        return None
+    return "Success"
+
+
 # Function to build and make a get request to an API endpoint
-def makeGetRequest(session, url, params={}):
+@lru_cache
+def makeUserGetRequest(session, url, params={}):
     headers = {"Authorization": "Bearer {}".format(session['token'])}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code == 200:
         return response.json()
-    elif response.status_code == 401 and checkTokenStatus(session) is not None:
-        return makeGetRequest(session, url, params)
+    elif response.status_code == 401 and checkUserTokenStatus(session) is not None:
+        return makeUserGetRequest(session, url, params)
     else:
         return None
 
 
 # Function to get the Spotify ID for the first time
 def getFirstSpotifyID(session):
-    r = makeGetRequest(session, "https://api.spotify.com/v1/me")
+    r = makeUserGetRequest(session, "https://api.spotify.com/v1/me")
     if r is not None and not getSpotifyID(r['id']):
         addSpotifyID(session['uid'], r['id'])
         return True
     else:
         return False
+
+
+@lru_cache()
+def getLastListened(uid):
+    headers = {"Authorization": "Bearer {}".format(getToken(uid)[0])}
+    response = requests.get("https://api.spotify.com/v1/me/player/recently-played", headers=headers, params={"limit": 1})
+    if response.status_code == 200:
+        return response.json()
+    elif response.status_code == 401 and checkTokenStatus(uid) is not None:
+        return getLastListened(uid)
+    else:
+        return None

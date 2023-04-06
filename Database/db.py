@@ -15,6 +15,13 @@ def getUsername(username):
         return cur.fetchone()
 
 
+def getUsernameByID(uid):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("SELECT Username FROM User WHERE uid LIKE %s", (uid,))
+        return cur.fetchone()
+
+
 def getSpotifyID(uid):
     with connect() as con:
         cur = con.cursor()
@@ -131,15 +138,10 @@ def updateScore(username, fUsername, score):
 
 
 # getFriends - takes username, returns all list of friends
-def getFriends(username):
+def getFriends(uid):
     with connect() as con:
         cur = con.cursor()
-
-        # uses Friend Table
-        # selects the entire username column and returns it
-        sql = "SELECT username FROM Friend"
-        cur.execute(sql)
-
+        cur.execute("SELECT frienduser_id FROM Friend WHERE useruser_id = %s", (uid,))
         return cur.fetchall()
 
 

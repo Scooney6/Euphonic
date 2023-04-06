@@ -84,43 +84,17 @@ def home():
     # If the user is logged in
     if 'loggedin' in session:
         # print(makeGetRequest(session, 'https://api.spotify.com/v1/me/top/tracks', {'limit': '5'}))
-        # Testcase
-        friends = [
-            {
-                "first_name": "Sophia",
-                "last_name": "Robertson",
-                "score": 98,
-                "track": "Flowers"
-            },
-            {
-                "first_name": "Lucas",
-                "last_name": "Johnson",
-                "score": 85,
-                "track": "Kill Bill"
-            },
-            {
-                "first_name": "Aria",
-                "last_name": "Patel",
-                "score": 80,
-                "track": "Boy's A Liar, Pt. 2"
-            },
-            {
-                "first_name": "Ethan",
-                "last_name": "Baker",
-                "score": 70,
-                "track": "Creepin'"
-            },
-            {
-                "first_name": "Ava",
-                "last_name": "Kim",
-                "score": 10,
-                "track": "Last Night"
-            }
-        ]
+
+        # data = {}
+        # friend_ids = getFriends(session)
+        # for fid in friend_ids:
+            # data[fid]['username'] = getUsernameByID(fid)
+            # data[fid]['track'] = getLastListened(fid)
+        # print(data)
         # Sort friends list by descending score
-        friends.sort(key=lambda x: x['score'], reverse=True)
+        # data.sort(key=lambda x: x['score'], reverse=True)
         # Code
-        return render_template("home.html", username=session['username'], friends=friends)
+        return render_template("home.html", username=session['username'])
     else:
         return redirect("/")
 
@@ -129,8 +103,11 @@ def home():
 def addFriendRoute():
     if 'friend_username' in request.form:
         if getUsername(request.form['friend_username']):
-            addFriend(session['uid'], request.form['friend_username'])
-            return redirect('home')
+            if getSpotifyID(getUID(request.form['friend_username'])):
+                addFriend(session['uid'], request.form['friend_username'])
+                return redirect('home')
+            else:
+                return render_template('home.html', msg='That user must link their Spotify first!')
         else:
             return render_template('home.html', msg="Username not found")
 
