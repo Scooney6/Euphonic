@@ -8,10 +8,10 @@ def connect():
     return mysql.connector.connect(**params)
 
 
-def getUsername(uid):
+def getUsername(username):
     with connect() as con:
         cur = con.cursor()
-        cur.execute("SELECT Username FROM User WHERE idUser LIKE %s", (uid,))
+        cur.execute("SELECT Username FROM User WHERE Username LIKE %s", (username,))
         return cur.fetchone()
 
 
@@ -129,6 +129,7 @@ def updateScore(username, fUsername, score):
         # destroys db connection
         return True
 
+
 # getFriends - takes username, returns all list of friends
 def getFriends(username):
     with connect() as con:
@@ -141,29 +142,20 @@ def getFriends(username):
 
         return cur.fetchall()
 
+
 # addFriend - takes username of user and username of friend   
-def addFriend(username, fUsername):
+def addFriend(uid, friend_username):
     with connect() as con:
         cur = con.cursor()
 
         # gets the userID of user because Comparison userId, not username
-        stmt1 = "SELECT userid FROM User WHERE username = %s"
-        val1 = (username)
-        cur.execute(stmt1, val1)
-        uID = cur.fetchone()
+        cur.execute("SELECT idUser FROM User WHERE username = %s", (friend_username,))
+        fid = cur.fetchone()[0]
 
-        # gets the userID of friend because Comparison userId, not username
-        stmt2 = "SELECT userid FROM User WHERE username = %s"
-        val2 = (fUsername)
-        cur.execute(stmt2, val2)
-        fID = cur.fetchone()
-        
         # inserts into the Adds Table
         # Adds table is referenced by tables User and Friend
         # linked by a forign keys that are not null
-        sql = "INSERT INTO Adds (user, friend) VALUES (%s, %s)"
-        val = (uID, fID)
-        cur.execute(sql, val)
+        cur.execute("INSERT INTO Friend (useruser_id, frienduser_id) VALUES (%s, %s)", (uid, fid))
         con.commit()
 
         return True

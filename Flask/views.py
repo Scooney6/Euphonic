@@ -83,7 +83,7 @@ def logout():
 def home():
     # If the user is logged in
     if 'loggedin' in session:
-        print(makeGetRequest(session, 'https://api.spotify.com/v1/me/top/tracks', {'limit': '5'}))
+        # print(makeGetRequest(session, 'https://api.spotify.com/v1/me/top/tracks', {'limit': '5'}))
         # Testcase
         friends = [
             {
@@ -123,6 +123,16 @@ def home():
         return render_template("home.html", username=session['username'], friends=friends)
     else:
         return redirect("/")
+
+
+@app.route('/add_friend', methods=["POST"])
+def addFriendRoute():
+    if 'friend_username' in request.form:
+        if getUsername(request.form['friend_username']):
+            addFriend(session['uid'], request.form['friend_username'])
+            return redirect('home')
+        else:
+            return render_template('home.html', msg="Username not found")
 
 
 # Comparison Page
