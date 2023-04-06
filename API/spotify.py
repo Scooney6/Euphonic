@@ -6,6 +6,7 @@ import requests
 from urllib.parse import urlencode
 from requests.auth import HTTPBasicAuth
 from Config.config import spotifyAuthParams
+from Database.db import *
 
 
 # Function to get the token for a user when they register an account
@@ -21,9 +22,9 @@ def getFirstToken(session, code):
         r = response.json()
         session['token'] = r['access_token']
         session['refresh_token'] = r['refresh_token']
-        session['expires_in'] = time.time() + r['expires_in']
-        # TODO Implement addToken
-        # addToken(r['access_token'], r['refresh_token'], r['expires_in'], session['uid'])
+        session['token_expiration'] = time.time() + r['expires_in']
+        addToken(r['access_token'], r['refresh_token'], session['token_expiration'], session['uid'])
+
         return True
     else:
         return False
@@ -38,7 +39,8 @@ def getAuthRedirect():
                     'response_type': 'code',
                     'redirect_uri': params['redirect_uri'],
                     'state': state_key,
-                    'scope': params['scope']}
+                    'scope': params['scope'],
+                    'show_dialog': True}
     return urlencode(query_params)
 
 
@@ -61,8 +63,7 @@ def checkTokenStatus(session):
             session['token'] = payload['access_token']
             session['refresh_token'] = payload['refresh_token']
             session['token_expiration'] = time.time() + payload['expires_in']
-            # TODO Implement add token in
-            # addToken(r['access_token'], r['refresh_token'], r['expires_in'], session['username'])
+            updateToken(payload['access_token'], payload['refresh_token'], session['token_expiration'], session['uid'])
     else:
         return None
     return "Success"
@@ -77,3 +78,12 @@ def makeGetRequest(session, url, params={}):
         return makeGetRequest(session, url, params)
     else:
         return None
+
+
+def getFirstSpotifyID(session):
+    r = makeGetRequest(session, "https://api.spotify.com/v1/me")
+    if r is not None and not getSpotifyID(r['id']):
+        addSpotifyID(session['uid'], r['id'])
+        return True
+    else:
+        return False

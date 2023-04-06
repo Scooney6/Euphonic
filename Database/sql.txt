@@ -4,6 +4,7 @@ CREATE TABLE `Euphonic`.`User` (
 `idUser` INT NOT NULL AUTO_INCREMENT,
 `username` VARCHAR(200) NOT NULL,
 `password` VARCHAR(200) NOT NULL,
+'idSpotify' VARCHAR(200),
 PRIMARY KEY (`idUser`));
 
 CREATE TABLE `Euphonic`.`Token` (
@@ -59,4 +60,3 @@ FOREIGN KEY (`friend`)
 REFERENCES `Euphonic`.`Friend` (`frienduser_id`)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION);
-

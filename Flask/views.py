@@ -15,13 +15,21 @@ def index():
 # Handle for login form submission
 @app.route('/login', methods=["POST"])
 def login():
-    if 'Username' in request.form and 'Password' in request.form:
-        username = request.form['Username']
-        password = request.form['Password']
+    if 'logusername' in request.form and 'logpass' in request.form:
+        username = request.form['logusername']
+        password = request.form['logpass']
         if authenticate(username, password):
             session['username'] = username
-            session['uid'] = getUID(username)
+            session['uid'] = getUID(username)[0]
             session['loggedin'] = True
+
+            if not getSpotifyID(session['uid'])[0]:
+                return redirect('https://accounts.spotify.com/authorize?' + getAuthRedirect())
+
+            t = getToken(session['uid'])
+            session['token'] = t[0]
+            session['refresh_token'] = t[1]
+            session['token_expiration'] = t[2]
             return redirect("home")
     else:
         return render_template("index.html", msg='Username and Password Required')
@@ -33,16 +41,15 @@ def register():
     if 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
-        if getUser(username):
+        if getUsername(username):
             msg = 'Username taken'
             return render_template("index.html", msg=msg)
         else:
-            # TODO implement addUser() in db.py
-            # addUser(username, password)
+            addUser(username, password)
 
             # Create Session variable for this user so we know they are logged in
             session['loggedin'] = True
-            session['uid'] = getUID(username)
+            session['uid'] = getUID(username)[0]
             session['username'] = username
 
             return redirect('https://accounts.spotify.com/authorize?' + getAuthRedirect())
@@ -171,10 +178,10 @@ def callback():
     # get the code and state spotify gave us
     code = request.args.get('code')
     state = request.args.get('state')
-    if not state:
-        return render_template("index.html", msg="Error with Spotify Authentication.")
-    else:
-        if getFirstToken(session, code):
-            return redirect("home")
+    if state and getFirstToken(session, code):
+        if getFirstSpotifyID(session):
+            return redirect('home')
         else:
-            return render_template("index.html", msg="Error with spotify authorization")
+            return render_template("index.html", msg="You can't register a spotify account to multiple accounts!")
+    else:
+        return render_template("index.html", msg="Error with Spotify Authorization.")

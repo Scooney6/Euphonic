@@ -8,14 +8,25 @@ def connect():
     return mysql.connector.connect(**params)
 
 
-# an example function for a function that returns all usernames from a table: Users
-# Note: using the "with connect():" syntax creates a db connection that will automatically be destroyed
-# after the return statement
-def getUser(username):
+def getUsername(uid):
     with connect() as con:
         cur = con.cursor()
-        cur.execute("SELECT Username FROM User WHERE Username LIKE %s", (username,))
+        cur.execute("SELECT Username FROM User WHERE idUser LIKE %s", (uid,))
         return cur.fetchone()
+
+
+def getSpotifyID(uid):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("SELECT idSpotify FROM User WHERE idUser LIKE %s", (uid,))
+        return cur.fetchone()
+
+
+def addSpotifyID(uid, sid):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("UPDATE User SET idSpotify = %s WHERE idUser = %s", (sid, uid))
+        con.commit()
 
 
 def authenticate(username, password):
@@ -35,43 +46,38 @@ def getUID(username):
         cur.execute("SELECT idUser FROM User WHERE Username = %s ", (username,))
         return cur.fetchone()
 
-def getUser(username):
-    with connect() as con:
-        cur = con.cursor()
-        cur.execute("SELECT Username FROM User WHERE Username = %s", (username,))
-        user = cur.fetchone()
-        return user[0] if user else None
 
-def authorize(username, password):
+def getToken(idUser):
     with connect() as con:
         cur = con.cursor()
-        cur.execute("SELECT Username FROM User WHERE Username = %s AND Password = %s", (username, password))
-        user = cur.fetchone()
-        if user:
-            return True
-        else:
-            return False
-
-def getToken(username):
-    with connect() as con:
-        cur = con.cursor()
-        cur.execute("SELECT Spotifytoken FROM User WHERE Username = %s", (username,))
+        cur.execute("SELECT token, refresh_token, expires_at FROM Token WHERE idUser = %s", (idUser,))
         token = cur.fetchone()
-        return token[0] if token else None
+        return token if token else None
 
-def adduser(username, password):
+
+def addUser(username, password):
     with connect() as con:
         cur = con.cursor()
         cur.execute("INSERT INTO User (Username, Password) VALUES (%s, %s)", (username, password))
         con.commit()
         return True
 
-def updateToken(username, token):
+
+def addToken(token, refresh_token, expires_at, idUser):
     with connect() as con:
         cur = con.cursor()
-        cur.execute("UPDATE User SET Spotifytoken = %s WHERE Username = %s", (token, username))
+        cur.execute("INSERT INTO Token (idUser, token, refresh_token, expires_at) VALUES (%s, %s, %s, %s)", (idUser, token, refresh_token, expires_at))
         con.commit()
         return True
+
+
+def updateToken(token, refresh_token, expires_at, idUser):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("UPDATE Token SET token = %s, refresh_token = %s, expires_at = %s WHERE idUser = %s", (token, refresh_token, expires_at, idUser))
+        con.commit()
+        return True
+
 
 # getScore - takes username, returns score
 def getScore(username):
@@ -95,7 +101,8 @@ def getScore(username):
         result = cur.fetchone
 
         return result
-    
+
+
 # updateScore - takes 2 usernames and score
 def updateScore(username, fUsername, score):
     with connect() as con:
