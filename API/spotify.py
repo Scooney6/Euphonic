@@ -103,7 +103,7 @@ def makeUserGetRequest(session, url, params={}):
 # Function to get the Spotify ID for the first time
 def getFirstSpotifyID(session):
     r = makeUserGetRequest(session, "https://api.spotify.com/v1/me", {})
-    if r is not None and not getSpotifyID(session['uid']):
+    if r is not None and not getSpotifyID(session['uid'])[0]:
         addSpotifyID(session['uid'], r['id'])
         return True
     else:
