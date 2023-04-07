@@ -89,7 +89,6 @@ def checkTokenStatus(uid):
 
 
 # Function to build and make a get request to an API endpoint
-@lru_cache
 def makeUserGetRequest(session, url, params={}):
     headers = {"Authorization": "Bearer {}".format(session['token'])}
     response = requests.get(url, headers=headers, params=params)
@@ -103,8 +102,8 @@ def makeUserGetRequest(session, url, params={}):
 
 # Function to get the Spotify ID for the first time
 def getFirstSpotifyID(session):
-    r = makeUserGetRequest(session, "https://api.spotify.com/v1/me")
-    if r is not None and not getSpotifyID(r['id']):
+    r = makeUserGetRequest(session, "https://api.spotify.com/v1/me", {})
+    if r is not None and not getSpotifyID(session['uid']):
         addSpotifyID(session['uid'], r['id'])
         return True
     else:
