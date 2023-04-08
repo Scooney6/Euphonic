@@ -82,15 +82,17 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Friend</th>
                                 <th scope="col">Last Listened</th>
+                                <th scope="col">Score</th>
                                 <th scope="col">Compare/Delete</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for friend in friends %}
+                            {% for key,friend in friend_data.items() %}
                             <tr>
                                 <td>{{ loop.index }}</td>
-                                <td>{{ friend['first_name'] }}</td>
+                                <td>{{ friend['username'] }}</td>
                                 <td>{{ friend['track'] }}</td>
+                                <td>{{ friend['score'] }}</td>
                                 <td>
                                     <a href="{{ url_for('compare', friend_username=friend['username']) }}">Compare</a>
                                     <a href="#">Delete</a>

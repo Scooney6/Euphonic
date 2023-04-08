@@ -12,7 +12,7 @@ from Database.db import *
 
 
 # Function to get the token for a user for the first time
-def getFirstToken(session, code):
+def getFirstToken(uid, code):
     # build request for user token
     params = spotifyAuthParams()
     url = 'https://accounts.spotify.com/api/token'
@@ -23,15 +23,11 @@ def getFirstToken(session, code):
     response = requests.post(url, auth=HTTPBasicAuth(params['client_id'], params['client_secret']), data=data)
     # If the request was successful:
     if response.status_code == 200:
-        # Set session variables
-        r = response.json()
-        session['token'] = r['access_token']
-        session['refresh_token'] = r['refresh_token']
-        session['token_expiration'] = time.time() + r['expires_in']
-
-        return True
+        print("Successfully retrieved first time token for user " + str(uid))
+        return response.json()
     else:
-        return False
+        print("Failed to retrieve first time token for user " + str(uid))
+        return None
 
 
 # Function to build the spotify redirect URL
@@ -63,60 +59,49 @@ def refreshToken(r_token):
         return None
 
 
-# Function to check the status of a token and refresh it if need be
-def checkUserTokenStatus(session):
-    if time.time() > session['token_expiration']:
-        payload = refreshToken(session['refresh_token'])
-        if payload:
-            session['token'] = payload['access_token']
-            session['refresh_token'] = payload['refresh_token']
-            session['token_expiration'] = time.time() + payload['expires_in']
-            updateToken(payload['access_token'], payload['refresh_token'], session['token_expiration'], session['uid'])
-    else:
-        return None
-    return "Success"
-
-
 def checkTokenStatus(uid):
+    print("Attempting to check token for user " + str(uid))
     token_info = getToken(uid)
-    if time.time() > token_info[2]:
+    if time.time() > float(token_info[2]):
+        print("Token for user " + str(uid) + " has expired. Attempting to retrieve new token")
         payload = refreshToken(token_info[1])
         if payload:
-            updateToken(payload['access_token'], payload['refresh_token'], time.time() + payload['expires_in'], uid)
+            print("Successfully retrieved new token for user: " + str(uid))
+            if 'refresh_token' in payload:
+                updateTokenNewRefresh(payload['access_token'], payload['refresh_token'], time.time() + payload['expires_in'], uid)
+            else:
+                updateToken(payload['access_token'], time.time() + payload['expires_in'], uid)
     else:
         return None
     return "Success"
 
 
-# Function to build and make a get request to an API endpoint
-def makeUserGetRequest(session, url, params={}):
-    headers = {"Authorization": "Bearer {}".format(session['token'])}
+def makeGetRequest(uid, url, params=None, t=None):
+    if params is None:
+        params = {}
+    if t is None:
+        headers = {"Authorization": "Bearer {}".format(getToken(uid)[0])}
+    else:
+        headers = {"Authorization": "Bearer {}".format(t['access_token'])}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code == 200:
+        print("Successfully made a get request on behalf of user " + str(uid))
         return response.json()
-    elif response.status_code == 401 and checkUserTokenStatus(session) is not None:
-        return makeUserGetRequest(session, url, params)
+    elif response.status_code == 401 and checkTokenStatus(uid) is not None:
+        return makeGetRequest(uid, url, params)
     else:
+        print("Failed to make a get request on behalf of user " + str(uid) + " for the url " + url)
+        print("Error code: " + str(response.status_code))
         return None
 
 
 # Function to get the Spotify ID for the first time
-def getFirstSpotifyID(session):
-    r = makeUserGetRequest(session, "https://api.spotify.com/v1/me", {})
-    if r is not None and not getSpotifyID(session['uid'])[0]:
-        addSpotifyID(session['uid'], r['id'])
+def getFirstSpotifyID(uid, t):
+    r = makeGetRequest(uid, "https://api.spotify.com/v1/me", t=t)
+    if r is not None and not getSpotifyID(uid):
+        addSpotifyID(uid, r['id'])
+        print("Successfully retrieved Spotify ID for user " + str(uid))
         return True
     else:
+        print("Failed to retrieve Spotify ID for user " + str(uid))
         return False
-
-
-@lru_cache()
-def getLastListened(uid):
-    headers = {"Authorization": "Bearer {}".format(getToken(uid)[0])}
-    response = requests.get("https://api.spotify.com/v1/me/player/recently-played", headers=headers, params={"limit": 1})
-    if response.status_code == 200:
-        return response.json()
-    elif response.status_code == 401 and checkTokenStatus(uid) is not None:
-        return getLastListened(uid)
-    else:
-        return None

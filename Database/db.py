@@ -12,21 +12,24 @@ def getUsername(username):
     with connect() as con:
         cur = con.cursor()
         cur.execute("SELECT Username FROM User WHERE Username LIKE %s", (username,))
-        return cur.fetchone()
+        val = cur.fetchone()
+        return val[0] if val is not None else None
 
 
 def getUsernameByID(uid):
     with connect() as con:
         cur = con.cursor()
-        cur.execute("SELECT Username FROM User WHERE uid LIKE %s", (uid,))
-        return cur.fetchone()
+        cur.execute("SELECT Username FROM User WHERE idUser LIKE %s", (uid,))
+        val = cur.fetchone()
+        return val[0] if val is not None else None
 
 
 def getSpotifyID(uid):
     with connect() as con:
         cur = con.cursor()
         cur.execute("SELECT idSpotify FROM User WHERE idUser LIKE %s", (uid,))
-        return cur.fetchone()
+        val = cur.fetchone()
+        return val[0] if val is not None else None
 
 
 def addSpotifyID(uid, sid):
@@ -51,15 +54,15 @@ def getUID(username):
     with connect() as con:
         cur = con.cursor()
         cur.execute("SELECT idUser FROM User WHERE Username = %s ", (username,))
-        return cur.fetchone()
+        val = cur.fetchone()
+        return val[0] if val is not None else None
 
 
 def getToken(idUser):
     with connect() as con:
         cur = con.cursor()
         cur.execute("SELECT token, refresh_token, expires_at FROM Token WHERE idUser = %s", (idUser,))
-        token = cur.fetchone()
-        return token if token else None
+        return cur.fetchone()
 
 
 def addUser(username, password):
@@ -78,7 +81,7 @@ def addToken(token, refresh_token, expires_at, idUser):
         return True
 
 
-def updateToken(token, refresh_token, expires_at, idUser):
+def updateTokenNewRefresh(token, refresh_token, expires_at, idUser):
     with connect() as con:
         cur = con.cursor()
         cur.execute("UPDATE Token SET token = %s, refresh_token = %s, expires_at = %s WHERE idUser = %s", (token, refresh_token, expires_at, idUser))
@@ -86,28 +89,21 @@ def updateToken(token, refresh_token, expires_at, idUser):
         return True
 
 
-# getScore - takes username, returns score
-def getScore(username):
+def updateToken(token, expires_at, idUser):
     with connect() as con:
         cur = con.cursor()
+        cur.execute("UPDATE Token SET token = %s, expires_at = %s WHERE idUser = %s", (token, expires_at, idUser))
+        con.commit()
+        return True
 
-        # get userid using username from User Table
-        # comparison table (has score column) does not have username column
-        # comparison table has a userid1 column
-        stmt1 = "SELECT userid FROM User WHERE username = %s"
-        val1 = (username)
-        cur.execute(stmt1, val1)
-        uID = cur.fetchone()
 
-        # in this query, a user's score is the sum of the scores associated
-        # with the user's userid
-        # result is the Score Sum 
-        stmt2 = "SELECT SUM(Score) FROM Comparison WHERE userid1 = %s"
-        val2 = uID
-        cur.execute(stmt2, val2)
-        result = cur.fetchone
-
-        return result
+# getScore - takes username, returns score
+def getScore(uid, fid):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("SELECT Score FROM Comparison WHERE (userid1 = %s and userid2 = %s) OR (userid1 = %s and userid2 = %s)", (uid, fid, fid, uid))
+        val = cur.fetchone()
+        return val[0] if val is not None else None
 
 
 # updateScore - takes 2 usernames and score
@@ -142,7 +138,9 @@ def getFriends(uid):
     with connect() as con:
         cur = con.cursor()
         cur.execute("SELECT frienduser_id FROM Friend WHERE useruser_id = %s", (uid,))
-        return cur.fetchall()
+        temp = cur.fetchall()
+        return [item for t in temp for item in t]
+
 
 
 # addFriend - takes username of user and username of friend   

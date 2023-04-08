@@ -23,19 +23,13 @@ def login():
         if authenticate(username, password):
             # Set session variables
             session['username'] = username
-            session['uid'] = getUID(username)[0]
+            session['uid'] = getUID(username)
             session['loggedin'] = True
 
             # Check if the user has a stored spotify ID, if they do that means they have successfully authorized us
             # through spotify and they can proceed. Otherwise, send them to the authorization redirect.
-            if not getSpotifyID(session['uid'])[0]:
+            if not getSpotifyID(session['uid']):
                 return redirect('https://accounts.spotify.com/authorize?' + getAuthRedirect())
-
-            # Set token related session variables
-            t = getToken(session['uid'])
-            session['token'] = t[0]
-            session['refresh_token'] = t[1]
-            session['token_expiration'] = t[2]
 
             # Now we can let them access the home page
             return redirect("home")
@@ -60,7 +54,7 @@ def register():
 
             # Create Session variable for this user so we know they are logged in
             session['loggedin'] = True
-            session['uid'] = getUID(username)[0]
+            session['uid'] = getUID(username)
             session['username'] = username
 
             # Redirect the user to Spotify authorization
@@ -84,17 +78,25 @@ def home():
     # If the user is logged in
     if 'loggedin' in session:
         # print(makeGetRequest(session, 'https://api.spotify.com/v1/me/top/tracks', {'limit': '5'}))
-
-        # data = {}
-        # friend_ids = getFriends(session)
-        # for fid in friend_ids:
-            # data[fid]['username'] = getUsernameByID(fid)
-            # data[fid]['track'] = getLastListened(fid)
-        # print(data)
-        # Sort friends list by descending score
-        # data.sort(key=lambda x: x['score'], reverse=True)
-        # Code
-        return render_template("home.html", username=session['username'])
+        friend_data = {}
+        friend_ids = getFriends(session['uid'])
+        for fid in friend_ids:
+            friend_data[str(fid)] = {}
+            friend_data[str(fid)]['username'] = getUsernameByID(fid)
+            track = makeGetRequest(fid, "https://api.spotify.com/v1/me/player/recently-played", params={"limit": 1})
+            if track is not None:
+                friend_data[str(fid)]['track'] = track
+            else:
+                friend_data[str(fid)]['track'] = "Unavailable"
+            score = getScore(session['uid'], str(fid))
+            if score is not None:
+                friend_data[str(fid)]['score'] = score
+            else:
+                friend_data[str(fid)]['score'] = 'N/A'
+        # Sort friends list by descending score NOT SURE IF THIS WORKS
+        sorted(friend_data, key=lambda x: friend_data[x]['score'], reverse=True)
+        print(friend_data)
+        return render_template("home.html", username=session['username'], friend_data=friend_data)
     else:
         return redirect("/")
 
@@ -188,11 +190,12 @@ def callback():
     if not state or 'error' in request.args:
         session.clear()
         return render_template("index.html", msg="Error with Spotify Authorization.")
-    if not getFirstToken(session, code):
+    t = getFirstToken(session['uid'], code)
+    if t is None:
         session.clear()
         return render_template("index.html", msg="Error With Spotify API")
-    if not getFirstSpotifyID(session):
+    if not getFirstSpotifyID(session['uid'], t):
         session.clear()
         return render_template("index.html", msg="You can't register a spotify account to multiple accounts!")
-    addToken(session['token'], session['refresh_token'], session['token_expiration'], session['uid'])
+    addToken(t['access_token'], t['refresh_token'], time.time() + t['expires_in'], session['uid'])
     return redirect('home')
