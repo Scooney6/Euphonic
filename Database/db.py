@@ -162,3 +162,21 @@ def addFriend(uid, friend_username):
             cur.execute("INSERT INTO Friend (useruser_id, frienduser_id) VALUES (%s, %s)", (uid, fid))
             con.commit()
         return True
+
+
+# deleteFriend - takes username of user and username of friend
+def deleteFriend(uid, friend_username):
+    with connect() as con:
+        cur = con.cursor()
+
+        # gets the userID of user because Comparison userId, not username
+        cur.execute("SELECT idUser FROM User WHERE username = %s",
+                    (friend_username,))
+        fid = cur.fetchone()[0]
+
+        # deletes from the Adds Table
+        cur.execute(
+            "DELETE FROM Friend WHERE useruser_id = %s AND frienduser_id = %s", (uid, fid))
+        con.commit()
+
+        return True

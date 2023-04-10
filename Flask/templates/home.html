@@ -95,7 +95,7 @@
                                 <td>{{ friend['score'] }}</td>
                                 <td>
                                     <a href="{{ url_for('compare', friend_username=friend['username']) }}">Compare</a>
-                                    <a href="#">Delete</a>
+                                    <a href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}">Delete</a>
                                 </td>
                             </tr>
                             {% endfor %}

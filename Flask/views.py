@@ -114,6 +114,16 @@ def addFriendRoute():
             return render_template('home.html', msg="Username not found")
 
 
+# deleteFriendRoute - deletes a friend from a user's friend list
+@app.route('/delete_friend/<friend_username>', methods=["GET"])
+def deleteFriendRoute(friend_username):
+    if getUsername(friend_username):
+        deleteFriend(session['uid'], friend_username)
+        return redirect('../home')
+    else:
+        return redirect('../home')
+
+
 # Comparison Page
 @app.route("/compare", methods=["POST", "GET"])
 def compare():
