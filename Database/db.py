@@ -142,7 +142,6 @@ def getFriends(uid):
         return [item for t in temp for item in t]
 
 
-
 # addFriend - takes username of user and username of friend   
 def addFriend(uid, friend_username):
     with connect() as con:
@@ -152,10 +151,14 @@ def addFriend(uid, friend_username):
         cur.execute("SELECT idUser FROM User WHERE username = %s", (friend_username,))
         fid = cur.fetchone()[0]
 
-        # inserts into the Adds Table
-        # Adds table is referenced by tables User and Friend
-        # linked by a forign keys that are not null
-        cur.execute("INSERT INTO Friend (useruser_id, frienduser_id) VALUES (%s, %s)", (uid, fid))
-        con.commit()
+        cur.execute("SELECT useruser_id, frienduser_id FROM Friend WHERE useruser_id = %s AND frienduser_id = %s",
+                    (uid, fid))
+        friend_exists = cur.fetchone()
 
+        if friend_exists is None:
+            # inserts into the Adds Table
+            # Adds table is referenced by tables User and Friend
+            # linked by a forign keys that are not null
+            cur.execute("INSERT INTO Friend (useruser_id, frienduser_id) VALUES (%s, %s)", (uid, fid))
+            con.commit()
         return True
