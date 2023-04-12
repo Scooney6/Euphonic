@@ -55,16 +55,18 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Friend</th>
+                                <th scope="col">Username</th>
                                 <th scope="col">Score</th>
+                                <th scope="col">Username</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for friend in friends %}
+                            {% for key,score in leaderboard.items() %}
                             <tr>
                                 <td>{{ loop.index }}</td>
-                                <td>{{ friend['first_name'] }}</td>
-                                <td>{{ friend['score'] }}</td>
+                                <td>{{ score['user1'] }}</td>
+                                <td>{{ score['score'] }}</td>
+                                <td>{{ score['user2'] }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -91,10 +93,14 @@
                             <tr>
                                 <td>{{ loop.index }}</td>
                                 <td>{{ friend['username'] }}</td>
+                                {% if 'track_href' in friend %}
+                                <td><a href="{{ friend['track_href'] }}">{{ friend['track'] }}</a></td>
+                                {% else %}
                                 <td>{{ friend['track'] }}</td>
+                                {% endif %}
                                 <td>{{ friend['score'] }}</td>
                                 <td>
-                                    <a href="{{ url_for('compare', friend_username=friend['username']) }}">Compare</a>
+                                    <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}">Compare</a>
                                     <a href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}">Delete</a>
                                 </td>
                             </tr>

@@ -56,6 +56,7 @@ def refreshToken(r_token):
     if response.status_code == 200:
         return response.json()
     else:
+        print("Failed to retrieve new token, code: " + str(response.status_code))
         return None
 
 

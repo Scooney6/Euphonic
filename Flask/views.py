@@ -77,7 +77,6 @@ def logout():
 def home():
     # If the user is logged in
     if 'loggedin' in session:
-        # print(makeGetRequest(session, 'https://api.spotify.com/v1/me/top/tracks', {'limit': '5'}))
         friend_data = {}
         friend_ids = getFriends(session['uid'])
         for fid in friend_ids:
@@ -85,7 +84,8 @@ def home():
             friend_data[str(fid)]['username'] = getUsernameByID(fid)
             track = makeGetRequest(fid, "https://api.spotify.com/v1/me/player/recently-played", params={"limit": 1})
             if track is not None:
-                friend_data[str(fid)]['track'] = track
+                friend_data[str(fid)]['track'] = track['items'][0]['track']['name']
+                friend_data[str(fid)]['track_href'] = track['items'][0]['track']['external_urls']['spotify']
             else:
                 friend_data[str(fid)]['track'] = "Unavailable"
             score = getScore(session['uid'], str(fid))
@@ -95,8 +95,15 @@ def home():
                 friend_data[str(fid)]['score'] = 'N/A'
         # Sort friends list by descending score NOT SURE IF THIS WORKS
         sorted(friend_data, key=lambda x: friend_data[x]['score'], reverse=True)
-        print(friend_data)
-        return render_template("home.html", username=session['username'], friend_data=friend_data)
+        leaderboard = {}
+        scores = getTopScores()
+        for i in range(len(scores)):
+            leaderboard[str(i)] = {}
+            leaderboard[str(i)]['user1'] = getUsernameByID(scores[i][0])
+            leaderboard[str(i)]['user2'] = getUsernameByID(scores[i][1])
+            leaderboard[str(i)]['score'] = scores[i][2]
+        return render_template("home.html", username=session['username'], friend_data=friend_data,
+                               leaderboard=leaderboard)
     else:
         return redirect("/")
 
@@ -109,9 +116,11 @@ def addFriendRoute():
                 addFriend(session['uid'], request.form['friend_username'])
                 return redirect('home')
             else:
-                return render_template('home.html', msg='That user must link their Spotify first!')
+                session['error'] = "That user must link their Spotify first"
+                return redirect('../home')
         else:
-            return render_template('home.html', msg="Username not found")
+            session['error'] = "Username not found"
+            return redirect('../home')
 
 
 # deleteFriendRoute - deletes a friend from a user's friend list
@@ -124,65 +133,49 @@ def deleteFriendRoute(friend_username):
         return redirect('../home')
 
 
+@app.route('/compare_route/<friend_username>', methods=["GET"])
+def compareRoute(friend_username):
+    if getUsername(friend_username):
+        if session['username'] < friend_username:
+            return redirect('../compare/' + session['username'] + '/' + friend_username)
+        else:
+            return redirect('../compare/' + friend_username + '/' + session['username'])
+
+
 # Comparison Page
-@app.route("/compare", methods=["POST", "GET"])
-def compare():
-    # Testcase
-    friend_username = "Chris"
-    comparison_score = 80
-    artists = [
-        {
-            "name": "Drake",
-            "genre": "Hip-Hop/Rap"
-        },
-        {
-            "name": "Olivia Rodrigo",
-            "genre": "Pop"
-        },
-        {
-            "name": "The Weeknd",
-            "genre": "Dance/Electronic"
-        },
-        {
-            "name": "Taylor Swift",
-            "genre": "Pop"
-        },
-        {
-            "name": "Morgan Wallen",
-            "genre": "Country"
-        }
-    ]
-    tracks = [
-        {
-            "name": "Flowers",
-            "artist": "Miley Cyrus"
-        },
-        {
-            "name": "Kill Bill",
-            "artist": "SZA"
-        },
-        {
-            "name": "Boy's A Liar, Pt. 2",
-            "artist": "PinkPantheress & Ice Spice"
-        },
-        {
-            "name": "Creepin'",
-            "artist": "Metro Boomin, The Weeknd & 21 Savage"
-        },
-        {
-            "name": "Last Night",
-            "artist": "Morgan Wallen"
-        }
-    ]
-    # Code
-    return render_template(
-        "compare.html",
-        username=session['username'],
-        friend_username=friend_username,
-        comparison_score=comparison_score,
-        artists=artists,
-        tracks=tracks
-    )
+@app.route("/compare/<user1>/<user2>", methods=["GET"])
+def compare(user1, user2):
+    u1id = getUID(user1)
+    u2id = getUID(user2)
+
+    user1_top_tracks = makeGetRequest(u1id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
+    user2_top_tracks = makeGetRequest(u2id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
+    shared_tracks = []
+    if user1_top_tracks is not None and user2_top_tracks is not None:
+        for track in user1_top_tracks['items']:
+            for track2 in user2_top_tracks['items']:
+                if track['id'] == track2['id']:
+                    shared_tracks.append(track)
+    else:
+        pass
+    print("tracks in common: " + str(shared_tracks))
+
+    user1_top_artists = makeGetRequest(u1id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
+    user2_top_artists = makeGetRequest(u2id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
+    shared_artists = []
+    if user1_top_artists is not None and user2_top_artists is not None:
+        for artist in user1_top_artists['items']:
+            for artist2 in user2_top_artists['items']:
+                if artist['id'] == artist2['id']:
+                    shared_artists.append(artist)
+    else:
+        pass
+    print("artists in common: " + str(shared_artists))
+
+    score = len(shared_artists) + len(shared_tracks)
+    updateScore(u1id, u2id, score)
+    return render_template("compare.html", user1=user1, user2=user2, shared_artists=shared_artists,
+                           shared_tracks=shared_tracks, score=score)
 
 
 # Callback route for spotify authorization

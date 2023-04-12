@@ -17,7 +17,7 @@
     <!-- Top menu -->
     <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
         <div class="container">
-            <a href="home" style="text-decoration:none;">
+            <a href="../../home" style="text-decoration:none;">
                 <button class="btn btn-secondary navbar-btn">Dashboard</button>
             </a> 
             <a class="navbar-brand" href="home">Euphonic</a>
@@ -30,14 +30,14 @@
     <!-- Body -->
     <div class="user-container">
         <div class="user">
-            <h3>{{ username }}</h3>
+            <h3>{{ user1 }}</h3>
         </div>
         <div class="comparison-score">
-            <h3>{{ comparison_score }}%</h3>
+            <h3>{{ score }}%</h3>
             <h6>Score</h6>
         </div>
         <div class="user">
-            <h3>{{ friendsUsername }}</h3>
+            <h3>{{ user2 }}</h3>
         </div>
     </div>
 
@@ -55,31 +55,13 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for artist in shared_artists %}
                             <tr>
-                                <td>1</td>
-                                <td>{{ artist_1 }}</td>
-                                <td>{{ artistGenre_1 }}</td>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ artist['name'] }}</td>
+                                <td>{{ artist['genres'] }}</td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>{{ artist_2 }}</td>
-                                <td>{{ artistGenre_2 }}</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>{{ artist_3 }}</td>
-                                <td>{{ artistGenre_3 }}</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>{{ artist_4 }}</td>
-                                <td>{{ artistGenre_4 }}</td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>{{ artist_5 }}</td>
-                                <td>{{ artistGenre_5 }}</td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -98,31 +80,13 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for track in shared_tracks %}
                             <tr>
-                                <td>1</td>
-                                <td>{{ track_1 }}</td>
-                                <td>{{ trackArtist_1 }}</td>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ track['name'] }}</td>
+                                <td>{{ track['artists']['name'] }}</td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>{{ track_2 }}</td>
-                                <td>{{ trackArtist_2 }}</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>{{ track_3 }}</td>
-                                <td>{{ trackArtist_3 }}</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>{{ track_4 }}</td>
-                                <td>{{ trackArtist_4 }}</td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>{{ track_5 }}</td>
-                                <td>{{ trackArtist_5 }}</td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

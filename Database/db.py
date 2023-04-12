@@ -106,34 +106,28 @@ def getScore(uid, fid):
         return val[0] if val is not None else None
 
 
-# updateScore - takes 2 usernames and score
-def updateScore(username, fUsername, score):
+def getTopScores():
     with connect() as con:
         cur = con.cursor()
-        
-        # gets the userID of user because Comparison userId, not username
-        stmt1 = "SELECT userid FROM User WHERE username = %s"
-        val1 = (username)
-        cur.execute(stmt1, val1)
-        uID = cur.fetchone()
+        cur.execute("SELECT * FROM Comparison ORDER BY Score DESC LIMIT 5")
+        return cur.fetchall()
 
-        # gets the userID of friend because Comparison userId, not username
-        stmt2 = "SELECT userid FROM User WHERE username = %s"
-        val2 = (fUsername)
-        cur.execute(stmt2, val2)
-        fID = cur.fetchone()
 
-        # updates the score using adjacent colums
-        stmt3 = "UPDATE Comparison SET Score = %s WHERE userid1 = %s AND userid2 = %s"
-        val3 = (score, uID, fID)
-        cur.execute(stmt3, val3)
+# updateScore - takes 2 uids and score
+def updateScore(uid1, uid2, score):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM Comparison WHERE userid1 = %s AND userid2 = %s", (uid1, uid2))
+        test = cur.fetchone()
+        if test is not None:
+            cur.execute("UPDATE Comparison SET Score = %s WHERE userid1 = %s AND userid2 = %s", (score, uid1, uid2))
+        else:
+            cur.execute("INSERT INTO Comparison (userid1, userid2, score) VALUES (%s, %s, %s)", (uid1, uid2, score))
         con.commit()
-
-        # destroys db connection
         return True
 
 
-# getFriends - takes username, returns all list of friends
+# getFriends - takes uid, returns all list of friends
 def getFriends(uid):
     with connect() as con:
         cur = con.cursor()
