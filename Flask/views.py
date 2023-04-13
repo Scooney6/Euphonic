@@ -33,6 +33,8 @@ def login():
 
             # Now we can let them access the home page
             return redirect("home")
+        else:
+            return render_template("index.html", msg='Username or Password incorrect!')
     else:
         return render_template("index.html", msg='Username and Password Required')
 
@@ -82,10 +84,13 @@ def home():
         for fid in friend_ids:
             friend_data[str(fid)] = {}
             friend_data[str(fid)]['username'] = getUsernameByID(fid)
-            track = makeGetRequest(fid, "https://api.spotify.com/v1/me/player/recently-played", params={"limit": 1})
+            track = makeGetRequest(
+                fid, "https://api.spotify.com/v1/me/player/recently-played", params={"limit": 1})
             if track is not None:
-                friend_data[str(fid)]['track'] = track['items'][0]['track']['name']
-                friend_data[str(fid)]['track_href'] = track['items'][0]['track']['external_urls']['spotify']
+                friend_data[str(
+                    fid)]['track'] = track['items'][0]['track']['name']
+                friend_data[str(
+                    fid)]['track_href'] = track['items'][0]['track']['external_urls']['spotify']
             else:
                 friend_data[str(fid)]['track'] = "Unavailable"
             score = getScore(session['uid'], str(fid))
@@ -94,7 +99,8 @@ def home():
             else:
                 friend_data[str(fid)]['score'] = 'N/A'
         # Sort friends list by descending score NOT SURE IF THIS WORKS
-        sorted(friend_data, key=lambda x: friend_data[x]['score'], reverse=True)
+        sorted(friend_data,
+               key=lambda x: friend_data[x]['score'], reverse=True)
         leaderboard = {}
         scores = getTopScores()
         for i in range(len(scores)):
@@ -148,8 +154,10 @@ def compare(user1, user2):
     u1id = getUID(user1)
     u2id = getUID(user2)
 
-    user1_top_tracks = makeGetRequest(u1id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
-    user2_top_tracks = makeGetRequest(u2id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
+    user1_top_tracks = makeGetRequest(
+        u1id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
+    user2_top_tracks = makeGetRequest(
+        u2id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
     shared_tracks = []
     if user1_top_tracks is not None and user2_top_tracks is not None:
         for track in user1_top_tracks['items']:
@@ -160,8 +168,10 @@ def compare(user1, user2):
         pass
     print("tracks in common: " + str(shared_tracks))
 
-    user1_top_artists = makeGetRequest(u1id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
-    user2_top_artists = makeGetRequest(u2id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
+    user1_top_artists = makeGetRequest(
+        u1id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
+    user2_top_artists = makeGetRequest(
+        u2id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
     shared_artists = []
     if user1_top_artists is not None and user2_top_artists is not None:
         for artist in user1_top_artists['items']:
@@ -185,6 +195,11 @@ def callback():
     code = request.args.get('code')
     state = request.args.get('state')
 
+    # Check if the user's unique identifier is stored in the session dictionary
+    if 'uid' not in session:
+        session.clear()
+        return render_template("index.html", msg="Error: User not authenticated.")
+
     # Now so many things have to happen it's a miracle this works.
     # First we check if Spotify gave us a State and if the user denied authorization.
     # If those things are fine we can try to get the user's access token.
@@ -200,5 +215,6 @@ def callback():
     if not getFirstSpotifyID(session['uid'], t):
         session.clear()
         return render_template("index.html", msg="You can't register a spotify account to multiple accounts!")
-    addToken(t['access_token'], t['refresh_token'], time.time() + t['expires_in'], session['uid'])
+    addToken(t['access_token'], t['refresh_token'],
+             time.time() + t['expires_in'], session['uid'])
     return redirect('home')
