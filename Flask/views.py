@@ -31,7 +31,7 @@ def login():
 
             # Check if the user has a stored spotify ID, if they do that means they have successfully authorized us
             # through spotify and they can proceed. Otherwise, send them to the authorization redirect.
-            if not getSpotifyID(session['uid']):
+            if not getSpotifyIDbyuID(session['uid']):
                 return redirect('https://accounts.spotify.com/authorize?' + getAuthRedirect())
 
             # Now we can let them access the home page
@@ -121,7 +121,7 @@ def home():
 def addFriendRoute():
     if 'friend_username' in request.form:
         if getUsername(request.form['friend_username']):
-            if getSpotifyID(getUID(request.form['friend_username'])):
+            if getSpotifyIDbyuID(getUID(request.form['friend_username'])):
                 addFriend(session['uid'], request.form['friend_username'])
                 return redirect('home')
             else:

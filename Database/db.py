@@ -32,6 +32,14 @@ def getSpotifyID(id_spotify):
         return val[0] if val is not None else None
 
 
+def getSpotifyIDbyuID(uid):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute("SELECT idSpotify FROM User WHERE idUser LIKE %s", (uid,))
+        val = cur.fetchone()
+        return val[0] if val is not None else None
+
+
 def addSpotifyID(uid, sid):
     with connect() as con:
         cur = con.cursor()
