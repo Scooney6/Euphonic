@@ -99,10 +99,14 @@ def makeGetRequest(uid, url, params=None, t=None):
 # Function to get the Spotify ID for the first time
 def getFirstSpotifyID(uid, t):
     r = makeGetRequest(uid, "https://api.spotify.com/v1/me", t=t)
-    if r is not None and getSpotifyID(uid) is not None:
-        addSpotifyID(uid, r['id'])
+    if r is not None:
         print("Successfully retrieved Spotify ID for user " + str(uid))
-        return True
+        if getSpotifyID(r['id']) is None:
+            addSpotifyID(uid, r['id'])
+            return "Success"
+        else:
+            print("User " + str(uid) + "'s Spotify ID is registered to another user")
+            return "Duplicate ID"
     else:
         print("Failed to retrieve Spotify ID for user " + str(uid))
-        return False
+        return "Failed to retrieve Spotify ID"

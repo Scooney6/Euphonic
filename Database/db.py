@@ -24,10 +24,10 @@ def getUsernameByID(uid):
         return val[0] if val is not None else None
 
 
-def getSpotifyID(uid):
+def getSpotifyID(id_spotify):
     with connect() as con:
         cur = con.cursor()
-        cur.execute("SELECT idSpotify FROM User WHERE idUser LIKE %s", (uid,))
+        cur.execute("SELECT idSpotify FROM User WHERE idSpotify LIKE %s", (id_spotify,))
         val = cur.fetchone()
         return val[0] if val is not None else None
 

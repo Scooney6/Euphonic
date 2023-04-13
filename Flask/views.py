@@ -1,3 +1,6 @@
+import itertools
+from collections import Counter
+
 from flask import render_template, redirect, request, session
 
 from API.spotify import *
@@ -155,7 +158,10 @@ def compare(user1, user2):
         for track in user1_top_tracks['items']:
             for track2 in user2_top_tracks['items']:
                 if track['id'] == track2['id']:
-                    shared_tracks.append(track)
+                    shared_tracks.append({
+                        'name': track['name'],
+                        'href': track['external_urls']['spotify']
+                    })
     else:
         pass
     print("tracks in common: " + str(shared_tracks))
@@ -163,19 +169,47 @@ def compare(user1, user2):
     user1_top_artists = makeGetRequest(u1id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
     user2_top_artists = makeGetRequest(u2id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
     shared_artists = []
+    user1_genres = []
+    user2_genres = []
     if user1_top_artists is not None and user2_top_artists is not None:
         for artist in user1_top_artists['items']:
+            user1_genres.append(artist['genres'])
             for artist2 in user2_top_artists['items']:
+                user2_genres.append(artist2['genres'])
                 if artist['id'] == artist2['id']:
-                    shared_artists.append(artist)
+                    shared_artists.append({
+                        'name': artist['name'],
+                        'href': artist['external_urls']['spotify']
+                    })
     else:
         pass
     print("artists in common: " + str(shared_artists))
+    user1_genre_freq = {}
+    for genre in itertools.chain.from_iterable(user1_genres):
+        if genre in user1_genre_freq.keys():
+            user1_genre_freq[genre] += 1
+        else:
+            user1_genre_freq[genre] = 1
+    user2_genre_freq = {}
+    for genre in itertools.chain.from_iterable(user2_genres):
+        if genre in user2_genre_freq.keys():
+            user2_genre_freq[genre] += 1
+        else:
+            user2_genre_freq[genre] = 1
 
+    shared_genres = {}
+    for genre in user1_genre_freq:
+        for genre2 in user2_genre_freq:
+            if genre == genre2:
+                shared_genres[genre] = (user1_genre_freq[genre] + user2_genre_freq[genre]) - abs(user1_genre_freq[genre] - user2_genre_freq[genre])
+
+    shared_genres = dict(sorted(shared_genres.items(), key=lambda x:x[1], reverse=True))
+    shared_genres = list(shared_genres.keys())[0:5]
+    print(str(shared_genres))
     score = len(shared_artists) + len(shared_tracks)
     updateScore(u1id, u2id, score)
     return render_template("compare.html", user1=user1, user2=user2, shared_artists=shared_artists,
-                           shared_tracks=shared_tracks, score=score)
+                           shared_genres=shared_genres, score=score)
 
 
 # Callback route for spotify authorization
@@ -197,8 +231,12 @@ def callback():
     if t is None:
         session.clear()
         return render_template("index.html", msg="Error With Spotify API")
-    if not getFirstSpotifyID(session['uid'], t):
+    id_check = getFirstSpotifyID(session['uid'], t)
+    if id_check == "Duplicate ID":
         session.clear()
         return render_template("index.html", msg="You can't register a spotify account to multiple accounts!")
+    elif id_check == "Failed to retrieve Spotify ID":
+        session.clear()
+        return render_template("index.html", msg="Error with Spotify Authorization")
     addToken(t['access_token'], t['refresh_token'], time.time() + t['expires_in'], session['uid'])
     return redirect('home')
