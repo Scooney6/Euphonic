@@ -151,6 +151,27 @@ def compareRoute(friend_username):
             return redirect('../compare/' + friend_username + '/' + session['username'])
 
 
+def determineVibe(vibe_factors):
+    maximum = max(vibe_factors, key=vibe_factors.get)
+    if maximum == 'valence':
+        if vibe_factors['valence'] >= 0.5:
+            return "Happy"
+        else:
+            return "Moody"
+    elif maximum == 'danceability':
+        if vibe_factors['danceability'] >= 0.5:
+            return "Groovy"
+        else:
+            return "Chill"
+    elif maximum == 'energy':
+        if vibe_factors['energy'] >= 0.5:
+            return "Explosive"
+        else:
+            return "Calm"
+    else:
+        return "Error :("
+
+
 # Comparison Page
 @app.route("/compare/<user1>/<user2>", methods=["GET"])
 def compare(user1, user2):
@@ -161,19 +182,59 @@ def compare(user1, user2):
         u1id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
     user2_top_tracks = makeGetRequest(
         u2id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
-    shared_tracks = []
+    user1_trackids = []
+    user2_trackids = []
+    user1_vibe = "Error"
+    user2_vibe = "Error"
     if user1_top_tracks is not None and user2_top_tracks is not None:
         for track in user1_top_tracks['items']:
-            for track2 in user2_top_tracks['items']:
-                if track['id'] == track2['id']:
-                    shared_tracks.append({
-                        'name': track['name'],
-                        'href': track['external_urls']['spotify']
-                    })
+            user1_trackids.append(track['id'])
+        for track in user2_top_tracks['items']:
+            user2_trackids.append(track['id'])
+        user1_trackids = ','.join(user1_trackids)
+        user2_trackids = ','.join(user2_trackids)
+        print(user1_trackids)
+
+        user1_track_features = makeGetRequest(u1id, "https://api.spotify.com/v1/audio-features",
+                                              params={'ids': user1_trackids})
+        user2_track_features = makeGetRequest(u2id, "https://api.spotify.com/v1/audio-features",
+                                              params={'ids': user2_trackids})
+        user1_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0, 'instrumentalness': 0.0, 'liveness': 0.0}
+        user2_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0, 'instrumentalness': 0.0, 'liveness': 0.0}
+
+        print(user1_track_features)
+
+        for track in user1_track_features['audio_features']:
+            user1_avg_features['valence'] += track['valence']
+            user1_avg_features['danceability'] += track['danceability']
+            user1_avg_features['energy'] += track['energy']
+            user1_avg_features['acousticness'] += track['acousticness']
+            user1_avg_features['instrumentalness'] += track['instrumentalness']
+            user1_avg_features['liveness'] += track['liveness']
+        for track in user2_track_features['audio_features']:
+            user2_avg_features['valence'] += track['valence']
+            user2_avg_features['danceability'] += track['danceability']
+            user2_avg_features['energy'] += track['energy']
+            user2_avg_features['acousticness'] += track['acousticness']
+            user2_avg_features['instrumentalness'] += track['instrumentalness']
+            user1_avg_features['liveness'] += track['liveness']
+        for feature in user1_avg_features:
+            user1_avg_features[feature] = user1_avg_features[feature] / len(user1_track_features)
+        for feature in user2_avg_features:
+            user2_avg_features[feature] = user2_avg_features[feature] / len(user2_track_features)
+
+        user1_vibe_factors = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0}
+        user2_vibe_factors = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0}
+        for factor in user1_vibe_factors:
+            user1_vibe_factors[factor] = abs(user1_avg_features[factor] - 0.5)
+        for factor in user2_vibe_factors:
+            user2_vibe_factors[factor] = abs(user2_avg_features[factor] - 0.5)
+        user1_vibe = determineVibe(user1_vibe_factors)
+        user2_vibe = determineVibe(user2_vibe_factors)
     else:
         pass
-    print("tracks in common: " + str(shared_tracks))
 
+    # Get shared top artists between the two users
     user1_top_artists = makeGetRequest(
         u1id, "https://api.spotify.com/v1/me/top/artists", params={'limit': 50})
     user2_top_artists = makeGetRequest(
@@ -194,6 +255,8 @@ def compare(user1, user2):
     else:
         pass
     print("artists in common: " + str(shared_artists))
+
+    # Get shared genres between the two users
     user1_genre_freq = {}
     for genre in itertools.chain.from_iterable(user1_genres):
         if genre in user1_genre_freq.keys():
@@ -206,20 +269,21 @@ def compare(user1, user2):
             user2_genre_freq[genre] += 1
         else:
             user2_genre_freq[genre] = 1
-
     shared_genres = {}
     for genre in user1_genre_freq:
         for genre2 in user2_genre_freq:
             if genre == genre2:
-                shared_genres[genre] = (user1_genre_freq[genre] + user2_genre_freq[genre]) - abs(user1_genre_freq[genre] - user2_genre_freq[genre])
-
-    shared_genres = dict(sorted(shared_genres.items(), key=lambda x:x[1], reverse=True))
+                shared_genres[genre] = (user1_genre_freq[genre] + user2_genre_freq[genre]) - abs(
+                    user1_genre_freq[genre] - user2_genre_freq[genre])
+    shared_genres = dict(sorted(shared_genres.items(), key=lambda x: x[1], reverse=True))
     shared_genres = list(shared_genres.keys())[0:5]
-    print(str(shared_genres))
-    score = len(shared_artists) + len(shared_tracks)
+
+
+
+    score = len(shared_artists)
     updateScore(u1id, u2id, score)
     return render_template("compare.html", user1=user1, user2=user2, shared_artists=shared_artists,
-                           shared_genres=shared_genres, score=score)
+                           shared_genres=shared_genres, score=score, user1_vibe=user1_vibe, user2_vibe=user2_vibe)
 
 
 # Callback route for spotify authorization
