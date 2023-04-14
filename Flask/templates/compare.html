@@ -14,6 +14,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"
         integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.4/font/bootstrap-icons.min.css"
+        integrity="sha512-yU7+yXTc4VUanLSjkZq+buQN3afNA4j2ap/mxvdr440P5aW9np9vIr2JMZ2E5DuYeC9bAoH9CuCR7SJlXAa4pg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -21,11 +25,11 @@
     <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
         <div class="container">
             <a href="../../home" style="text-decoration:none;">
-                <button class="btn btn-secondary navbar-btn">Dashboard</button>
-            </a> 
+                <button class="bttn btn-secondary navbar-bttn">Dashboard</button>
+            </a>
             <a class="navbar-brand" href="home">Euphonic</a>
             <a href="/" style="text-decoration:none;"> <!-- Remove line when Logout is setup -->
-                <button class="btn btn-secondary navbar-btn">Logout</button>
+                <button class="bttn btn-secondary navbar-bttn">Logout</button>
             </a> <!-- Remove line when Logout is setup -->
         </div>
     </nav>
@@ -97,26 +101,26 @@
 
     <!-- Modal -->
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header d-flex justify-content-center">
-            <h5 class="modal-title error-modal-title text-center" id="errorModalLabel">Error Message</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body error-modal-body text-center">
-            {{ msg }}
-          </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center">
+                    <h5 class="modal-title error-modal-title text-center" id="errorModalLabel">Error Message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body error-modal-body text-center">
+                    {{ msg }}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  
+
     {% if msg %}
     <script>
-      document.addEventListener("DOMContentLoaded", function (event) {
-        var myModal = document.getElementById("errorModal");
-        var myModalInstance = new bootstrap.Modal(myModal);
-        myModalInstance.show();
-      });
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var myModal = document.getElementById("errorModal");
+            var myModalInstance = new bootstrap.Modal(myModal);
+            myModalInstance.show();
+        });
     </script>
     {% endif %}
 </body>

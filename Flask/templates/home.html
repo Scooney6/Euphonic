@@ -14,6 +14,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"
         integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.4/font/bootstrap-icons.min.css"
+        integrity="sha512-yU7+yXTc4VUanLSjkZq+buQN3afNA4j2ap/mxvdr440P5aW9np9vIr2JMZ2E5DuYeC9bAoH9CuCR7SJlXAa4pg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -27,26 +31,41 @@
             </div>
             <a class="navbar-brand" href="{{ url_for('home') }}">Euphonic</a>
             <form action="{{ url_for('logout') }}" method="POST">
-                <button type="submit" class="btn btn-secondary navbar-btn">Logout</button>
+                <button type="submit" class="bttn btn-secondary navbar-bttn">Logout</button>
             </form>
         </div>
     </nav>
 
     <!-- Body -->
-    <div class="user-container">
-        <div class="comparison-score"></div>
-        <div class="user">
-            <h3>Find your Friends!</h3>
-            <div class="row">
-                <div class="small-12 columns">
-                    <form action="{{ url_for('addFriendRoute') }}" method="POST">
-                        <input type="text" name="friend_username" placeholder="Type in friends username"><br>
-                        <button type="submit" class="btn mt-4" style="text-decoration: none;">Send Request</button>
-                    </form>
+    <div class="section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="text-center align-self-center">
+                    <!-- <div class="section pb-5 pt-5 pt-sm-2 text-center"> -->
+                    <div class="card-3d-wrap-friends mx-auto">
+                        <div class="card-3d-wrapper-friends">
+                            <div class="card-friends">
+                                <div class="center-wrap">
+                                    <div class="section text-center">
+                                        <h4 class="mb-15 pb-3">Find your Friends!</h4>
+                                        <form action="{{ url_for('addFriendRoute') }}" method="POST">
+                                            <div class="form-group">
+                                                <input type="username" name="friend_username" class="form-style"
+                                                    placeholder="Friend's username" id="friend_username"
+                                                    autocomplete="off">
+                                                <i class="input-icon uil uil-at"></i>
+                                            </div>
+                                            <input type="submit" class="bttn mt-4" value="Send Request">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </div> -->
                 </div>
             </div>
         </div>
-        <div class="comparison-score"></div>
     </div>
 
     <div class="user-container mt-5">
@@ -88,7 +107,7 @@
                                 <th scope="col">Friend</th>
                                 <th scope="col">Last Listened</th>
                                 <th scope="col">Score</th>
-                                <th scope="col">Compare/Delete</th>
+                                <th scope="col">Compare<br>Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -103,8 +122,23 @@
                                 {% endif %}
                                 <td>{{ friend['score'] }}</td>
                                 <td>
-                                    <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}">Compare</a>
-                                    <a href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}">Delete</a>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}"><button
+                                                type="button" class="btn btn-primary"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+                                                </svg><span class="visually-hidden">Compare</span></button></a>
+                                        <a
+                                            href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}"><button
+                                                type="button" class="btn btn-danger"><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                                </svg><span class="visually-hidden">Delete</span></button></a>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -117,26 +151,27 @@
 
     <!-- Modal -->
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header d-flex justify-content-center">
-            <h5 class="modal-title error-modal-title text-center" id="errorModalLabel">Error Message</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body error-modal-body text-center">
-            {{ msg }}
-          </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center">
+                    <h5 class="modal-title error-modal-title text-center" id="errorModalLabel">Error Message
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body error-modal-body text-center">
+                    {{ msg }}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  
+
     {% if msg %}
     <script>
-      document.addEventListener("DOMContentLoaded", function (event) {
-        var myModal = document.getElementById("errorModal");
-        var myModalInstance = new bootstrap.Modal(myModal);
-        myModalInstance.show();
-      });
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var myModal = document.getElementById("errorModal");
+            var myModalInstance = new bootstrap.Modal(myModal);
+            myModalInstance.show();
+        });
     </script>
     {% endif %}
 </body>

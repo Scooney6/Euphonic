@@ -120,8 +120,50 @@ h6 span {
   transition: all 600ms ease-out;
 }
 
+.card-3d-wrap-friends {
+  position: relative;
+  width: 440px;
+  max-width: 100%;
+  height: 240px;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  perspective: 800px;
+  margin-top: 60px;
+}
+
+.card-3d-wrapper-friends {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  transition: all 600ms ease-out;
+}
+
 .card-front,
 .card-back {
+  width: 100%;
+  height: 100%;
+  background-color: #2a2b38;
+  background-image: url('pat.svg');
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  background-size: 300%;
+  position: absolute;
+  border-radius: 6px;
+  left: 0;
+  top: 0;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.card-friends {
   width: 100%;
   height: 100%;
   background-color: #2a2b38;
@@ -259,7 +301,7 @@ h6 span {
   transition: all 200ms linear;
 }
 
-.btn {
+.bttn {
   border-radius: 4px;
   height: 44px;
   font-size: 13px;
@@ -288,14 +330,14 @@ h6 span {
   box-shadow: 0 8px 24px 0 rgba(255, 235, 167, .2);
 }
 
-.btn:active,
-.btn:focus {
+.bttn:active,
+.bttn:focus {
   background-color: #102770;
   color: #ffeba7;
   box-shadow: 0 8px 24px 0 rgba(16, 39, 112, .2);
 }
 
-.btn:hover {
+.bttn:hover {
   background-color: #102770;
   color: #ffeba7;
   box-shadow: 0 8px 24px 0 rgba(16, 39, 112, .2);
@@ -372,7 +414,7 @@ h6 span {
   color: #fff;
 }
 
-.navbar-btn {
+.navbar-bttn {
   margin-left: 10px;
 }
 
@@ -409,7 +451,7 @@ h6 span {
 
 /* Error Popup */
 .error-modal-title {
-  color: red;
+  color: orange;
 }
 
 .error-modal-body {
