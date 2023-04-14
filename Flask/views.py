@@ -142,7 +142,7 @@ def deleteFriendRoute(friend_username):
 @app.route('/compare_route/<friend_username>', methods=["GET"])
 def compareRoute(friend_username):
     if getUsername(friend_username):
-        if session['username'] < friend_username:
+        if session['username'].lower() < friend_username.lower():
             return redirect('../compare/' + session['username'] + '/' + friend_username)
         else:
             return redirect('../compare/' + friend_username + '/' + session['username'])
