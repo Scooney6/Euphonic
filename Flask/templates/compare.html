@@ -77,6 +77,21 @@
         <div class="user">
             <div class="row">
                 <div class="col-md-12">
+                    <h3 class="text-center mb-4">Music Similarity</h3>
+                    <h4>Danceability: {{ music_similarity['danceability'] }}</h4>
+                    <h5> {{ music_similarity['danceability_percent'] }}</h5>
+                    <h4>Energy: {{ music_similarity['energy'] }}</h4>
+                    <h5> {{ music_similarity['energy_percent'] }}</h5>
+                    <h4>Mood: {{ music_similarity['valence'] }}</h4>
+                    <h5> {{ music_similarity['valence_percent'] }}</h5>
+                    <br>
+                    <h4>Vibe: {{ music_similarity['vibe'] }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="user">
+            <div class="row">
+                <div class="col-md-12">
                     <h3 class="text-center mb-4">Top 5 Genres in Common</h3>
                     <table class="table table-striped">
                         <thead>

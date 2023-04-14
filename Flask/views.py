@@ -170,6 +170,10 @@ def determineVibe(vibe_factors):
 
 
 # Comparison Page
+def percentChange(param, param1):
+    return str(round((param - param1) / abs(param)))
+
+
 @app.route("/compare/<user1>/<user2>", methods=["GET"])
 def compare(user1, user2):
     u1id = getUID(user1)
@@ -199,8 +203,10 @@ def compare(user1, user2):
                                               params={'ids': user2_trackids})
 
         # Get the average of those features
-        user1_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0, 'instrumentalness': 0.0, 'liveness': 0.0}
-        user2_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0, 'instrumentalness': 0.0, 'liveness': 0.0}
+        user1_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0,
+                              'instrumentalness': 0.0, 'liveness': 0.0}
+        user2_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0,
+                              'instrumentalness': 0.0, 'liveness': 0.0}
         for track in user1_track_features['audio_features']:
             user1_avg_features['valence'] += track['valence']
             user1_avg_features['danceability'] += track['danceability']
@@ -233,6 +239,68 @@ def compare(user1, user2):
         user1_vibe = determineVibe(user1_vibe_factors)
         user2_vibe = determineVibe(user2_vibe_factors)
         sum_avg_feature_difference = 0
+        music_similarity = {}
+
+        if user1_avg_features['energy'] > user2_avg_features['energy']:
+            music_similarity['energy_percent'] = user1 + " listens to " + percentChange(
+                user1_avg_features['energy'],
+                user2_avg_features['energy']) + "% more energetic music than " + user2
+        else:
+            music_similarity['energy_percent'] = user2 + " listens to " + percentChange(
+                user2_avg_features['energy'],
+                user1_avg_features['energy']) + "% more energetic music than " + user1
+
+        if user1_avg_features['energy'] > 0 and user2_avg_features['energy'] > 0:
+            music_similarity['energy'] = "You both listen to songs that have more energy than average"
+        elif user1_avg_features['energy'] < 0 and user2_avg_features['energy'] < 0:
+            music_similarity['energy'] = "You both listen to songs that have less energy than average"
+        elif user1_avg_features['energy'] > 0 > user2_avg_features['energy']:
+            music_similarity[
+                'energy'] = user1 + " listens to songs that have more energy than average, but " + user2 + " listens to songs that have less energy than average"
+        elif user1_avg_features['energy'] < 0 < user2_avg_features['energy']:
+            music_similarity[
+                'energy'] = user1 + " listens to songs that have less energy than average, but " + user2 + " listens to songs that have more energy than average"
+
+        if user1_avg_features['valence'] > user2_avg_features['valence']:
+            music_similarity['valence_percent'] = user1 + " listens to " + percentChange(
+                user1_avg_features['valence'],
+                user2_avg_features['valence']) + "% more happy music than " + user2
+        else:
+            music_similarity['valence_percent'] = user2 + " listens to " + percentChange(
+                user2_avg_features['valence'],
+                user1_avg_features['valence']) + "% more happy music than " + user1
+
+        if user1_avg_features['valence'] > 0 and user2_avg_features['valence'] > 0:
+            music_similarity['valence'] = "You both listen to more happy songs than sad songs"
+        elif user1_avg_features['valence'] < 0 and user2_avg_features['valence'] < 0:
+            music_similarity['valence'] = "You both listen to more sad songs than happy songs"
+        elif user1_avg_features['valence'] > 0 > user2_avg_features['valence']:
+            music_similarity[
+                'valence'] = user1 + " listens to more happy songs, but " + user2 + " listens to more sad songs"
+        elif user1_avg_features['valence'] < 0 < user2_avg_features['valence']:
+            music_similarity[
+                'valence'] = user1 + " listens to more sad songs, but " + user2 + "listens to more happy songs"
+
+        if user1_avg_features['danceability'] > user2_avg_features['danceability']:
+            music_similarity['danceability_percent'] = user1 + " listens to " + percentChange(
+                user1_avg_features['danceability'],
+                user2_avg_features['danceability']) + "% more danceable music than " + user2
+        else:
+            music_similarity['danceability_percent'] = user2 + " listens to " + percentChange(
+                user2_avg_features['danceability'],
+                user1_avg_features['danceability']) + "% more danceable music than " + user1
+
+        if user1_avg_features['danceability'] > 0 and user2_avg_features['danceability'] > 0:
+            music_similarity['danceability'] = "You both listen to songs that are more danceable than average"
+        elif user1_avg_features['danceability'] < 0 and user2_avg_features['danceability'] < 0:
+            music_similarity['danceability'] = "You both listen to songs that are less danceable than average"
+        elif user1_avg_features['danceability'] > 0 > user2_avg_features['danceability']:
+            music_similarity[
+                'danceability'] = user1 + " listens to more danceable songs, but " + user2 + " listens to less danceable songs"
+        elif user1_avg_features['danceability'] < 0 < user2_avg_features['danceability']:
+            music_similarity[
+                'danceability'] = user1 + " listens to less danceable songs, but " + user2 + "listens to more danceable songs"
+
         for factor in user1_avg_features:
             sum_avg_feature_difference += abs(user1_avg_features[factor] - user2_avg_features[factor])
         sum_avg_feature_difference = 1 - (sum_avg_feature_difference / len(user1_avg_features.keys()))
@@ -285,7 +353,8 @@ def compare(user1, user2):
     sum_shared_genres = 0
     for genre in shared_genres:
         sum_shared_genres += shared_genres[genre]
-    normalized_sum_shared_genres = sum_shared_genres / (len(list(itertools.chain.from_iterable(user1_genres))) + len(list(itertools.chain.from_iterable(user2_genres))))
+    normalized_sum_shared_genres = sum_shared_genres / (len(list(itertools.chain.from_iterable(user1_genres))) + len(
+        list(itertools.chain.from_iterable(user2_genres))))
     genre_score = 50 * normalized_sum_shared_genres
     shared_genres = dict(sorted(shared_genres.items(), key=lambda x: x[1], reverse=True))
     shared_genres = dict(itertools.islice(shared_genres.items(), 5))
@@ -293,14 +362,19 @@ def compare(user1, user2):
 
     if user2_vibe == user1_vibe:
         vibe_bonus = 10
+        music_similarity['vibe'] = "You both share the same Vibe!"
     else:
         vibe_bonus = 0
+        music_similarity['vibe'] = user1 + " and " + user2 + " have a different music vibe"
 
-    print("artist: " + str(artist_score) + " genre: " + str(genre_score) + " vibe: " + str(vibe_bonus) + " music " + str(music_similarity_score))
+    print(
+        "artist: " + str(artist_score) + " genre: " + str(genre_score) + " vibe: " + str(vibe_bonus) + " music " + str(
+            music_similarity_score))
     score = round(artist_score + genre_score + vibe_bonus + music_similarity_score)
     updateScore(u1id, u2id, score)
     return render_template("compare.html", user1=user1, user2=user2, shared_artists=shared_artists,
-                           shared_genres=shared_genres, score=score, user1_vibe=user1_vibe, user2_vibe=user2_vibe)
+                           shared_genres=shared_genres, score=score, user1_vibe=user1_vibe, user2_vibe=user2_vibe,
+                           music_similarity=music_similarity)
 
 
 # Callback route for spotify authorization
