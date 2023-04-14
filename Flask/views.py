@@ -175,6 +175,7 @@ def compare(user1, user2):
     u1id = getUID(user1)
     u2id = getUID(user2)
 
+    # Get top 50 tracks for both users
     user1_top_tracks = makeGetRequest(
         u1id, "https://api.spotify.com/v1/me/top/tracks", params={'limit': 50})
     user2_top_tracks = makeGetRequest(
@@ -183,6 +184,7 @@ def compare(user1, user2):
     user2_trackids = []
     user1_vibe = "Error"
     user2_vibe = "Error"
+    # Get the features for the top 50 tracks of both users
     if user1_top_tracks is not None and user2_top_tracks is not None:
         for track in user1_top_tracks['items']:
             user1_trackids.append(track['id'])
@@ -195,9 +197,10 @@ def compare(user1, user2):
                                               params={'ids': user1_trackids})
         user2_track_features = makeGetRequest(u2id, "https://api.spotify.com/v1/audio-features",
                                               params={'ids': user2_trackids})
+
+        # Get the average of those features
         user1_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0, 'instrumentalness': 0.0, 'liveness': 0.0}
         user2_avg_features = {'valence': 0.0, 'danceability': 0.0, 'energy': 0.0, 'acousticness': 0.0, 'instrumentalness': 0.0, 'liveness': 0.0}
-
         for track in user1_track_features['audio_features']:
             user1_avg_features['valence'] += track['valence']
             user1_avg_features['danceability'] += track['danceability']
@@ -232,8 +235,8 @@ def compare(user1, user2):
         sum_avg_feature_difference = 0
         for factor in user1_avg_features:
             sum_avg_feature_difference += abs(user1_avg_features[factor] - user2_avg_features[factor])
-        sum_avg_feature_difference = 1 - sum_avg_feature_difference
-        music_similarity_score = 10 * sum_avg_feature_difference
+        sum_avg_feature_difference = 1 - (sum_avg_feature_difference / len(user1_avg_features.keys()))
+        music_similarity_score = 25 * sum_avg_feature_difference
     else:
         pass
 
@@ -249,15 +252,16 @@ def compare(user1, user2):
         for artist in user1_top_artists['items']:
             user1_genres.append(artist['genres'])
             for artist2 in user2_top_artists['items']:
-                user2_genres.append(artist2['genres'])
                 if artist['id'] == artist2['id']:
                     shared_artists.append({
                         'name': artist['name'],
                         'href': artist['external_urls']['spotify']
                     })
+        for artist2 in user2_top_artists['items']:
+            user2_genres.append(artist2['genres'])
     else:
         pass
-    artist_score = len(shared_artists) * 5
+    artist_score = len(shared_artists) * 4
 
     # Get shared genres between the two users
     user1_genre_freq = {}
@@ -278,20 +282,22 @@ def compare(user1, user2):
             if genre == genre2:
                 shared_genres[genre] = (user1_genre_freq[genre] + user2_genre_freq[genre]) - abs(
                     user1_genre_freq[genre] - user2_genre_freq[genre])
+    sum_shared_genres = 0
+    for genre in shared_genres:
+        sum_shared_genres += shared_genres[genre]
+    normalized_sum_shared_genres = sum_shared_genres / (len(list(itertools.chain.from_iterable(user1_genres))) + len(list(itertools.chain.from_iterable(user2_genres))))
+    genre_score = 50 * normalized_sum_shared_genres
     shared_genres = dict(sorted(shared_genres.items(), key=lambda x: x[1], reverse=True))
     shared_genres = dict(itertools.islice(shared_genres.items(), 5))
-    genre_score = 0
-    for genre in shared_genres:
-        genre_score += shared_genres[genre]
-    genre_score = genre_score * 0.2
     shared_genres = list(shared_genres.keys())[0:5]
 
     if user2_vibe == user1_vibe:
-        vibe_bonus = 50
+        vibe_bonus = 10
     else:
         vibe_bonus = 0
 
-    score = artist_score + genre_score + vibe_bonus + music_similarity_score
+    print("artist: " + str(artist_score) + " genre: " + str(genre_score) + " vibe: " + str(vibe_bonus) + " music " + str(music_similarity_score))
+    score = round(artist_score + genre_score + vibe_bonus + music_similarity_score)
     updateScore(u1id, u2id, score)
     return render_template("compare.html", user1=user1, user2=user2, shared_artists=shared_artists,
                            shared_genres=shared_genres, score=score, user1_vibe=user1_vibe, user2_vibe=user2_vibe)
