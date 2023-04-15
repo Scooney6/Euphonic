@@ -24,91 +24,88 @@
     <!-- Top menu -->
     <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
         <div class="container">
-            <a href="../../home" style="text-decoration:none;">
+            <a href="{{ url_for('home') }}" style="text-decoration:none;">
                 <button class="bttn btn-secondary navbar-bttn">Dashboard</button>
             </a>
-            <a class="navbar-brand" href="home">Euphonic</a>
-            <a href="/" style="text-decoration:none;"> <!-- Remove line when Logout is setup -->
+            <a class="navbar-brand euphonic-custom-font" href="{{ url_for('home') }}">Euphonic</a>
+            <form action="{{ url_for('logout') }}" method="POST">
                 <button class="bttn btn-secondary navbar-bttn">Logout</button>
-            </a> <!-- Remove line when Logout is setup -->
+            </form>
         </div>
     </nav>
 
     <!-- Body -->
-    <div class="user-container">
-        <div class="user">
-            <h3>{{ user1 }}</h3>
-            <h4>Vibe: {{ user1_vibe }}</h4>
-        </div>
-        <div class="comparison-score">
-            <h3>{{ score }}%</h3>
-            <h6>Similarity</h6>
-        </div>
-        <div class="user">
-            <h3>{{ user2 }}</h3>
-            <h4>Vibe: {{ user2_vibe }}</h4>
-        </div>
-    </div>
-
-    <div class="user-container">
-        <div class="user">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3 class="text-center mb-4">Top 5 Artists in Common</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Artist</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for artist in shared_artists %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td><a href="{{ artist['href'] }}">{{ artist['name'] }}</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="section mt-3">
+        <div class="container">
+            <div class="row justify-content-around">
+                <div class="user">
+                    <h3>{{ user1 }}</h3>
+                    <h4>Vibe: {{ user1_vibe }}</h4>
+                </div>
+                <div class="comparison-score">
+                    <h3>{{ score }}%</h3>
+                    <h6>Similarity</h6>
+                </div>
+                <div class="user">
+                    <h3>{{ user2 }}</h3>
+                    <h4>Vibe: {{ user2_vibe }}</h4>
                 </div>
             </div>
-        </div>
-        <div class="user">
             <div class="row">
-                <div class="col-md-12">
-                    <h3 class="text-center mb-4">Music Similarity</h3>
-                    <h4>Danceability: {{ music_similarity['danceability'] }}</h4>
-                    <h5> {{ music_similarity['danceability_percent'] }}</h5>
-                    <h4>Energy: {{ music_similarity['energy'] }}</h4>
-                    <h5> {{ music_similarity['energy_percent'] }}</h5>
-                    <h4>Mood: {{ music_similarity['valence'] }}</h4>
-                    <h5> {{ music_similarity['valence_percent'] }}</h5>
-                    <br>
-                    <h4>Vibe: {{ music_similarity['vibe'] }}</h4>
+                <div class="user">
+                    <div class="col-md-12">
+                        <h3 class="text-center mb-4">Top 5 Artists in Common</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Artist</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for artist in shared_artists %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><a href="{{ artist['href'] }}">{{ artist['name'] }}</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="user">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3 class="text-center mb-4">Top 5 Genres in Common</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Genre</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for genre in shared_genres %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>{{ genre }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="user">
+                    <div class="col-md-12">
+                        <h3 class="text-center mb-4">Music Similarity</h3>
+                        <h4>Danceability: {{ music_similarity['danceability'] }}</h4>
+                        <h5> {{ music_similarity['danceability_percent'] }}</h5>
+                        <h4>Energy: {{ music_similarity['energy'] }}</h4>
+                        <h5> {{ music_similarity['energy_percent'] }}</h5>
+                        <h4>Mood: {{ music_similarity['valence'] }}</h4>
+                        <h5> {{ music_similarity['valence_percent'] }}</h5>
+                        <br>
+                        <h4>Vibe: {{ music_similarity['vibe'] }}</h4>
+                    </div>
+                </div>
+                <div class="user">
+                    <div class="col-md-12">
+                        <h3 class="text-center mb-4">Top 5 Genres in Common</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Genre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for genre in shared_genres %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ genre }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,7 +116,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header d-flex justify-content-center">
-                    <h5 class="modal-title error-modal-title text-center" id="errorModalLabel">Error Message</h5>
+                    <h5 class="modal-title error-modal-title text-center" id="errorModalLabel">Error Message
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body error-modal-body text-center">
@@ -139,4 +137,5 @@
     </script>
     {% endif %}
 </body>
+
 </html>
