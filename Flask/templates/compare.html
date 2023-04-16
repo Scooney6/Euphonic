@@ -45,6 +45,7 @@
                 <div class="col mx-5 my-5 comparison-score">
                     <h3>{{ score }}%</h3>
                     <h5>Similarity</h5>
+                    <h6>{{ music_similarity['vibe'] }}</h6>
                 </div>
                 <div class="col mx-5 my-auto user">
                     <h3>{{ user2 }}</h3>
@@ -74,14 +75,13 @@
                     <!-- </div> -->
                 </div>
                 <div class="user col mx-2">
-                    <h3 class="text-center mb-4">Music Similarity</h3>
-                    <h5>{{ music_similarity['danceability'] }}</h5>
-                    <p>{{ music_similarity['danceability_percent'] }}</p>
-                    <h5>{{ music_similarity['energy'] }}</h5>
-                    <p>{{ music_similarity['energy_percent'] }}</p>
-                    <h5>{{ music_similarity['valence'] }}</h5>
-                    <p>{{ music_similarity['valence_percent'] }}</p>
-                    <h5>{{ music_similarity['vibe'] }}</h5>
+                    <h3 class="text-center mb-2 align-center"><b>Music Similarity</b></h3>
+                    <h5 class="mt-2">{{ music_similarity['danceability'] }}</h5>
+                    <p class="my-0">{{ music_similarity['danceability_percent'] }}</p>
+                    <h5 class="mt-2">{{ music_similarity['energy'] }}</h5>
+                    <p class="my-0">{{ music_similarity['energy_percent'] }}</p>
+                    <h5 class="my-2">{{ music_similarity['valence'] }}</h5>
+                    <p class="my-0">{{ music_similarity['valence_percent'] }}</p>
                 </div>
                 <div class="user col mx-5 my-auto">
                     <h3 class="text-center mb-4">Top 5 Genres in Common</h3>
