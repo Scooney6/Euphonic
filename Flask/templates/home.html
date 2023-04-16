@@ -39,25 +39,73 @@
     <div class="section mt-3">
         <div class="container justify-content-around">
             <div class="row justify-content-around">
-                <div class="text-center align-self-center">
-                    <div class="card-3d-wrap-friends mx-auto">
-                        <div class="card-friends">
-                            <div class="center-wrap">
-                                <div class="section text-center">
-                                    <h4 class="mb-1 pb-3">Find your Friends!</h4>
-                                    <form action="{{ url_for('addFriendRoute') }}" method="POST">
-                                        <div class="form-group">
-                                            <input type="username" name="friend_username" class="form-style"
-                                                placeholder="Friend's username" id="friend_username" autocomplete="off">
-                                            <i class="input-icon uil uil-at"></i>
-                                        </div>
-                                        <input type="submit" class="bttn mt-4" value="Add Friend">
-                                    </form>
+                <div class="col">
+                    <div class="text-center align-self-center">
+                        <div class="card-3d-wrap-friends mx-auto">
+                            <div class="card-friends">
+                                <div class="center-wrap">
+                                    <div class="section text-center">
+                                        <h4 class="mb-1 pb-3">Find your Friends!</h4>
+                                        <form action="{{ url_for('addFriendRoute') }}">
+                                            <div class="form-group">
+                                                <input type="username" name="friend_username" class="form-style"
+                                                    placeholder="Friend's username" id="friend_username"
+                                                    autocomplete="off">
+                                                <i class="input-icon uil uil-at"></i>
+                                            </div>
+                                            <input type="submit" class="bttn mt-4" value="Send Request">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% if friend_request_data %}
+                <div class="col">
+                    <div class="text-center align-self-center">
+                        <div class="card-3d-wrap-friends mx-auto">
+                            <div class="card-friends">
+                                <div class="center-wrap">
+                                    <div class="section text-center">
+                                        <h3>Friend Requests</h3>
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">User</th>
+                                                    <th scope="col">Accept</th>
+                                                    <th scope="col">Deny</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for key,friend in friend_request_data.items() %}
+                                                <tr>
+                                                    <td class="align-middle">{{ loop.index }}</td>
+                                                    <td class="align-middle"><b>{{ friend['username'] }}</td>
+                                                    <td class="align-middle">
+                                                        <a href="{{ url_for('addFriendRoute', friend_username=friend['username']) }}"
+                                                            class="btn btn-success"><i
+                                                                class="bi bi-person-fill-add"></i><span
+                                                                class="visually-hidden">Accept</span></a>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <a href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}"
+                                                            class="btn btn-danger"><i
+                                                                class="bi bi-person-fill-slash"></i><span
+                                                                class="visually-hidden">Deny</span></a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
             <div class="row justify-content-around mt-5">
                 <div class="col mx-5 user justify-content-around">
@@ -95,7 +143,8 @@
                                     <th scope="col">Friend</th>
                                     <th scope="col">Last Listen</th>
                                     <th scope="col">Score</th>
-                                    <th scope="col">Compare<br>Delete</th>
+                                    <th scope="col">Compare</th>
+                                    <th scope="col">Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -104,22 +153,21 @@
                                     <td class="align-middle">{{ loop.index }}</td>
                                     <td class="align-middle"><b>{{ friend['username'] }}</td>
                                     {% if 'track_href' in friend %}
-                                    <td class="align-middle"><a href="{{ friend['track_href'] }}" class="link">{{ friend['track'] }}</a></td>
+                                    <td class="align-middle"><a href="{{ friend['track_href'] }}" class="link">{{
+                                            friend['track'] }}</a></td>
                                     {% else %}
                                     <td class="align-middle">{{ friend['track'] }}</td>
                                     {% endif %}
                                     <td class="align-middle">{{ friend['score'] }}</td>
                                     <td class="align-middle">
-                                        <div class="btn-group my-auto">
-                                            <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}"><button
-                                                    type="button" class="btn btn-primary"><i
-                                                        class="bi bi-graph-up"></i><span
-                                                        class="visually-hidden">Compare</span></button></a>
-                                            <a
-                                                href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}"><button
-                                                    type="button" class="btn btn-danger"><i class="bi bi-x-circle"></i><span
-                                                        class="visually-hidden">Delete</span></button></a>
-                                        </div>
+                                        <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}"
+                                            class="btn btn-primary"><i class="bi bi-person-lines-fill"></i><span
+                                                class="visually-hidden">Compare</span></a>
+                                    </td>
+                                    <td class="align-middle">
+                                        <a href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}"
+                                            class="btn btn-danger"><i class="bi bi-person-fill-x"></i><span
+                                                class="visually-hidden">Delete</span></a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -131,7 +179,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Error Modal -->
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

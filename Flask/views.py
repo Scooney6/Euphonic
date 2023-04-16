@@ -83,7 +83,12 @@ def home():
     # If the user is logged in
     if 'loggedin' in session:
         friend_data = {}
+        friend_request_data = {}
         friend_ids = getFriends(session['uid'])
+        friend_request_ids = getFriendsRequests(session['uid'])
+        for fid in friend_request_ids:
+            friend_request_data[str(fid)] = {}
+            friend_request_data[str(fid)]['username'] = getUsernameByID(fid)
         for fid in friend_ids:
             friend_data[str(fid)] = {}
             friend_data[str(fid)]['username'] = getUsernameByID(fid)
@@ -108,18 +113,19 @@ def home():
             leaderboard[str(i)]['user1'] = getUsernameByID(scores[i][0])
             leaderboard[str(i)]['user2'] = getUsernameByID(scores[i][1])
             leaderboard[str(i)]['score'] = scores[i][2]
-        return render_template("home.html", username=session['username'], friend_data=friend_data,
+        return render_template("home.html", username=session['username'], friend_data=friend_data, friend_request_data=friend_request_data,
                                leaderboard=leaderboard)
     else:
         return redirect("/")
 
 
-@app.route('/add_friend', methods=["POST"])
+@app.route('/add_friend')
 def addFriendRoute():
-    if 'friend_username' in request.form:
-        if getUsername(request.form['friend_username']):
-            if getSpotifyIDbyuID(getUID(request.form['friend_username'])):
-                addFriend(session['uid'], request.form['friend_username'])
+    if 'friend_username' in request.args:
+        friend_username = request.args['friend_username']
+        if getUsername(friend_username):
+            if getSpotifyIDbyuID(getUID(friend_username)):
+                addFriend(session['uid'], friend_username)
                 return redirect('home')
             else:
                 session['error'] = "That user must link their Spotify first"

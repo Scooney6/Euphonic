@@ -179,6 +179,23 @@ def deleteFriend(uid, friend_username):
         # deletes from the Adds Table
         cur.execute(
             "DELETE FROM Friend WHERE useruser_id = %s AND frienduser_id = %s", (uid, fid))
+        cur.execute(
+            "DELETE FROM Friend WHERE useruser_id = %s AND frienduser_id = %s", (fid, uid))
         con.commit()
 
         return True
+
+
+# getFriendsRequests - takes uid, returns all list of friend requests
+def getFriendsRequests(uid):
+    with connect() as con:
+        cur = con.cursor()
+        cur.execute(
+            "SELECT useruser_id FROM Friend WHERE frienduser_id = %s", (uid,))
+        temp1 = cur.fetchall()
+        cur2 = con.cursor()
+        cur2.execute(
+            "SELECT frienduser_id FROM Friend WHERE useruser_id = %s", (uid,))
+        temp2 = cur2.fetchall()
+        temp = [x for x in temp1 if x not in temp2]
+        return [item for t in temp for item in t]
