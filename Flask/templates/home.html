@@ -26,8 +26,7 @@
     <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg">
         <div class="container">
             <div class="navbar-text mr-5">
-                <span>Hello {{ username }}!
-                </span>
+                <span>Hello {{ username }}!</span>
             </div>
             <a class="navbar-brand euphonic-custom-font" href="{{ url_for('home') }}">Euphonic</a>
             <form action="{{ url_for('logout') }}" method="POST">
@@ -76,10 +75,10 @@
                             <tbody>
                                 {% for key,score in leaderboard.items() %}
                                 <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ score['user1'] }}</td>
-                                    <td>{{ score['score'] }}</td>
-                                    <td>{{ score['user2'] }}</td>
+                                    <td class="align-middle">{{ loop.index }}</td>
+                                    <td class="align-middle">{{ score['user1'] }}</td>
+                                    <td class="align-middle">{{ score['score'] }}</td>
+                                    <td class="align-middle">{{ score['user2'] }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -102,16 +101,16 @@
                             <tbody>
                                 {% for key,friend in friend_data.items() %}
                                 <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ friend['username'] }}</td>
+                                    <td class="align-middle">{{ loop.index }}</td>
+                                    <td class="align-middle"><b>{{ friend['username'] }}</td>
                                     {% if 'track_href' in friend %}
-                                    <td><a href="{{ friend['track_href'] }}" class="link">{{ friend['track'] }}</a></td>
+                                    <td class="align-middle"><a href="{{ friend['track_href'] }}" class="link">{{ friend['track'] }}</a></td>
                                     {% else %}
-                                    <td>{{ friend['track'] }}</td>
+                                    <td class="align-middle">{{ friend['track'] }}</td>
                                     {% endif %}
-                                    <td>{{ friend['score'] }}</td>
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="align-middle">{{ friend['score'] }}</td>
+                                    <td class="align-middle">
+                                        <div class="btn-group my-auto">
                                             <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}"><button
                                                     type="button" class="btn btn-primary"><i
                                                         class="bi bi-graph-up"></i><span
