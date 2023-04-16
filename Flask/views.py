@@ -133,6 +133,8 @@ def addFriendRoute():
         else:
             session['error'] = "Username not found"
             return redirect('../home')
+    else:
+        return redirect('../home')
 
 
 # deleteFriendRoute - deletes a friend from a user's friend list
