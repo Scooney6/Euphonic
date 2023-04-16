@@ -4,29 +4,29 @@ CREATE TABLE `Euphonic`.`User` (
 `idUser` INT NOT NULL AUTO_INCREMENT,
 `username` VARCHAR(200) NOT NULL,
 `password` VARCHAR(200) NOT NULL,
-'idSpotify' VARCHAR(200),
+`idSpotify` VARCHAR(200),
 PRIMARY KEY (`idUser`));
 
 CREATE TABLE `Euphonic`.`Token` (
 `idUser` INT NOT NULL,
-`token` VARCHAR(200) NOT NULL,
-`refresh_token` VARCHAR(200) NOT NULL,
-`expires_in` VARCHAR(200) NOT NULL,
+`token` VARCHAR(400) NOT NULL,
+`refresh_token` VARCHAR(400) NOT NULL,
+`expires_at` VARCHAR(200) NOT NULL,
 PRIMARY KEY (`idUser`),
 FOREIGN KEY (`idUser`) REFERENCES `Euphonic`.`User` (`idUser`)
-ON DELETE NO ACTION
+ON DELETE CASCADE
 ON UPDATE NO ACTION);
 
 CREATE TABLE `Euphonic`.`Friend` (
+`useruser_id` INT NOT NULL,
 `frienduser_id` INT NOT NULL,
-`username` VARCHAR(200) NULL,
-PRIMARY KEY (`frienduser_id`),
-INDEX `frienduser_id_idx` (`frienduser_id` ASC) VISIBLE,
-CONSTRAINT `frienduser_id`
 FOREIGN KEY (`frienduser_id`)
+REFERENCES `Euphonic`.`User` (`idUser`),
+FOREIGN KEY (`useruser_id`)
 REFERENCES `Euphonic`.`User` (`idUser`)
-ON DELETE NO ACTION
+ON DELETE CASCADE
 ON UPDATE NO ACTION);
+
 
 CREATE TABLE `Euphonic`.`Comparison` (
 `userid1` INT NOT NULL,
@@ -41,22 +41,6 @@ ON DELETE NO ACTION
 ON UPDATE NO ACTION,
 CONSTRAINT `userid2`
 FOREIGN KEY (`userid2`)
-REFERENCES `Euphonic`.`Friend` (`frienduser_id`)
-ON DELETE NO ACTION
-ON UPDATE NO ACTION);
-
-CREATE TABLE `Euphonic`.`Adds` (
-`user` INT NOT NULL,
-`friend` INT NOT NULL,
-PRIMARY KEY (`user`, `friend`),
-INDEX `friend_idx` (`friend` ASC) VISIBLE,
-CONSTRAINT `user`
-FOREIGN KEY (`user`)
 REFERENCES `Euphonic`.`User` (`idUser`)
-ON DELETE NO ACTION
-ON UPDATE NO ACTION,
-CONSTRAINT `friend`
-FOREIGN KEY (`friend`)
-REFERENCES `Euphonic`.`Friend` (`frienduser_id`)
-ON DELETE NO ACTION
+ON DELETE CASCADE
 ON UPDATE NO ACTION);
