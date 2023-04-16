@@ -27,7 +27,7 @@
             <a href="{{ url_for('home') }}" style="text-decoration:none;">
                 <button class="bttn btn-secondary navbar-bttn">Dashboard</button>
             </a>
-            <a class="navbar-brand euphonic-custom-font" href="{{ url_for('home') }}">Euphonic</a>
+            <a style="text-indent: -15%;" class="navbar-brand mr-5 euphonic-custom-font" href="{{ url_for('home') }}">Euphonic</a>
             <form action="{{ url_for('logout') }}" method="POST">
                 <button class="bttn btn-secondary navbar-bttn">Logout</button>
             </form>
@@ -54,7 +54,6 @@
             </div>
             <div class="row pb-4 mt-2 justify-content-around">
                 <div class="user col mx-5 my-auto">
-                    <!-- <div class="col-md-12"> -->
                     <h3 class="text-center mb-4">Top 5 Artists in Common</h3>
                     <table class="table">
                         <thead>
@@ -72,7 +71,6 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <!-- </div> -->
                 </div>
                 <div class="user col mx-2">
                     <h3 class="text-center mb-2 align-center"><b>Music Similarity</b></h3>

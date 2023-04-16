@@ -52,7 +52,7 @@
                                                 placeholder="Friend's username" id="friend_username" autocomplete="off">
                                             <i class="input-icon uil uil-at"></i>
                                         </div>
-                                        <input type="submit" class="bttn mt-4" value="Send Request">
+                                        <input type="submit" class="bttn mt-4" value="Add Friend">
                                     </form>
                                 </div>
                             </div>
@@ -114,11 +114,11 @@
                                         <div class="btn-group">
                                             <a href="{{ url_for('compareRoute', friend_username=friend['username']) }}"><button
                                                     type="button" class="btn btn-primary"><i
-                                                        class="bi bi-check"></i><span
+                                                        class="bi bi-graph-up"></i><span
                                                         class="visually-hidden">Compare</span></button></a>
                                             <a
                                                 href="{{ url_for('deleteFriendRoute', friend_username=friend['username']) }}"><button
-                                                    type="button" class="btn btn-danger"><i class="bi bi-x"></i><span
+                                                    type="button" class="btn btn-danger"><i class="bi bi-x-circle"></i><span
                                                         class="visually-hidden">Delete</span></button></a>
                                         </div>
                                     </td>
