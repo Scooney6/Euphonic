@@ -163,6 +163,7 @@ def addFriend(uid, friend_username):
             # Adds table is referenced by tables User and Friend
             # linked by a forign keys that are not null
             cur.execute("INSERT INTO Friend (useruser_id, frienduser_id) VALUES (%s, %s)", (uid, fid))
+            cur.execute("DELETE FROM Friend WHERE useruser_id = %s AND frienduser_id = %s", (uid, uid))
             con.commit()
         return True
 
