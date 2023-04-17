@@ -130,6 +130,7 @@ def updateScore(uid1, uid2, score):
         if test is not None:
             cur.execute("UPDATE Comparison SET Score = %s WHERE userid1 = %s AND userid2 = %s", (score, uid1, uid2))
         else:
+            cur.execute("DELETE FROM Comparison WHERE userid1 = %s AND userid2 = %s", (uid2, uid1))
             cur.execute("INSERT INTO Comparison (userid1, userid2, score) VALUES (%s, %s, %s)", (uid1, uid2, score))
         con.commit()
         return True
