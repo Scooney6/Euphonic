@@ -145,25 +145,23 @@ def getFriends(uid):
         return [item for t in temp for item in t]
 
 
-# addFriend - takes username of user and username of friend   
+# addFriend - takes userid of user and username of friend
 def addFriend(uid, friend_username):
     with connect() as con:
         cur = con.cursor()
 
-        # gets the userID of user because Comparison userId, not username
+        # get the userid of the friend
         cur.execute("SELECT idUser FROM User WHERE username = %s", (friend_username,))
         fid = cur.fetchone()[0]
 
+        # Check if that friendship already exists
         cur.execute("SELECT useruser_id, frienduser_id FROM Friend WHERE useruser_id = %s AND frienduser_id = %s",
                     (uid, fid))
         friend_exists = cur.fetchone()
 
+        # if not, add the friend
         if friend_exists is None:
-            # inserts into the Adds Table
-            # Adds table is referenced by tables User and Friend
-            # linked by a forign keys that are not null
             cur.execute("INSERT INTO Friend (useruser_id, frienduser_id) VALUES (%s, %s)", (uid, fid))
-            cur.execute("DELETE FROM Friend WHERE useruser_id = %s AND frienduser_id = %s", (uid, uid))
             con.commit()
         return True
 

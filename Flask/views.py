@@ -125,8 +125,12 @@ def addFriendRoute():
         friend_username = request.args['friend_username']
         if getUsername(friend_username):
             if getSpotifyIDbyuID(getUID(friend_username)):
-                addFriend(session['uid'], friend_username)
-                return redirect('home')
+                if getUID(friend_username) != session['uid']:
+                    addFriend(session['uid'], friend_username)
+                    return redirect('home')
+                else:
+                    session['error'] = "You can't add yourself as a friend. (Wouldn't that be nice!)"
+                    return redirect('../home')
             else:
                 session['error'] = "That user must link their Spotify first"
                 return redirect('../home')
