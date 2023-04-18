@@ -80,6 +80,11 @@ def logout():
 # Home Page
 @app.route("/home", methods=["POST", "GET"])
 def home():
+    msg = None
+    if 'error' in session:
+        msg = session['error']
+        session['error'] = None
+        
     # If the user is logged in
     if 'loggedin' in session:
         friend_data = {}
@@ -114,7 +119,7 @@ def home():
             leaderboard[str(i)]['user2'] = getUsernameByID(scores[i][1])
             leaderboard[str(i)]['score'] = scores[i][2]
         return render_template("home.html", username=session['username'], friend_data=friend_data, friend_request_data=friend_request_data,
-                               leaderboard=leaderboard)
+                               leaderboard=leaderboard, msg=msg)
     else:
         return redirect("/")
 
@@ -190,6 +195,12 @@ def percentChange(param, param1):
 def compare(user1, user2):
     u1id = getUID(user1)
     u2id = getUID(user2)
+
+    
+    msg = None
+    if 'error' in session:
+        msg = session['error']
+        session['error'] = None
 
     # Get top 50 tracks for both users
     user1_top_tracks = makeGetRequest(
@@ -388,7 +399,7 @@ def compare(user1, user2):
     updateScore(u1id, u2id, score)
     return render_template("compare.html", user1=user1, user2=user2, shared_artists=shared_artists,
                            shared_genres=shared_genres, score=score, user1_vibe=user1_vibe, user2_vibe=user2_vibe,
-                           music_similarity=music_similarity)
+                           music_similarity=music_similarity, msg=msg)
 
 
 # Callback route for spotify authorization
