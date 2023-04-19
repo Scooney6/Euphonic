@@ -364,6 +364,10 @@ h6 span {
   display: block;
 }
 
+.euphonic-select {
+  appearance: none;
+}
+
 /***** Top menu *****/
 
 .navbar {
